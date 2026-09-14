@@ -1,0 +1,5 @@
+# Treat build artifacts as binary so Git never normalises or diffs their bytes.
+# Without this, a PDF committed from a Windows machine (core.autocrlf) can pick
+# up CR/LF translation and arrive corrupt — and the in-page viewer on /cv/
+# would fail on it.
+*.pdf binary

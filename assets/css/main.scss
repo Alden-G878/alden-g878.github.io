@@ -152,3 +152,123 @@
 .project-metrics ul {
   margin: 0.25rem 0 1rem 1.25rem;
 }
+
+/* ==========================================================================
+   CV tabs — CSS-only, no JavaScript
+   --------------------------------------------------------------------------
+   Structure: two visually-hidden radios, then the label list, then the panes,
+   all siblings inside `.cv-tabs`. `:checked ~` does the switching.
+
+   The radios stay in the DOM (not `display:none`) because the labels' `for`
+   attributes give them real click + keyboard behaviour for free: Tab reaches
+   the group, arrow keys move between tabs, :focus-visible draws the ring on
+   the matching label. Replacing them with buttons would require JS.
+   ========================================================================== */
+
+.cv-tabs {
+  margin: 1.5rem 0 0;
+}
+
+/* Visually hidden, but still focusable and keyboard-navigable. */
+.cv-tabs__control {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.cv-tabs__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1rem;
+  padding: 0 0 0.5rem;
+  list-style: none;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.cv-tabs__list li {
+  margin: 0;
+}
+
+/* Reuses the chip look from the portfolio filters so the two controls match. */
+.cv-tabs__label {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.35rem 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: transparent;
+  color: #444;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cv-tabs__label:hover {
+  background: #f0f0f0;
+}
+
+/* The inactive label is still a valid tab, but should read as secondary. */
+#cv-tab-interactive:checked ~ .cv-tabs__list label[for="cv-tab-interactive"],
+#cv-tab-document:checked ~ .cv-tabs__list label[for="cv-tab-document"] {
+  background: #7a8288;
+  border-color: #7a8288;
+  color: #fff;
+}
+
+/* Focus ring is drawn on the label, since the radio itself is clipped.
+   Must be scoped per-input: a bare `:focus-visible ~ .cv-tabs__list label`
+   matches BOTH labels whenever either radio has focus, outlining the whole
+   tab bar. Pair each input with the label that points at it. */
+#cv-tab-interactive:focus-visible ~ .cv-tabs__list label[for="cv-tab-interactive"],
+#cv-tab-document:focus-visible ~ .cv-tabs__list label[for="cv-tab-document"] {
+  outline: 2px solid #7a8288;
+  outline-offset: 2px;
+}
+
+/* ---- Panes: hidden until their radio is checked -------------------------- */
+
+.cv-pane {
+  display: none;
+}
+
+#cv-tab-interactive:checked ~ .cv-pane--interactive,
+#cv-tab-document:checked ~ .cv-pane--document {
+  display: block;
+}
+
+/* ---- Embedded PDF ------------------------------------------------------- */
+
+.cv-pane__hint {
+  font-size: 0.85rem;
+  color: #777;
+  margin: 0 0 0.75rem;
+}
+
+.cv-embed {
+  display: block;
+  width: 100%;
+  height: min(80vh, 1100px);
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.cv-embed__fallback {
+  font-size: 0.9rem;
+  padding: 1rem 1.25rem;
+}
+
+/* Mobile Safari/Chrome refuse inline PDFs and render the <object> fallback
+   instead; keep the element short there so the pane doesn't leave a gap. */
+@media screen and (max-width: 37.5em) {
+  .cv-embed {
+    height: 60vh;
+  }
+}

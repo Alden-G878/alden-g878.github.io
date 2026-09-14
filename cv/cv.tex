@@ -1,0 +1,166 @@
+% ===========================================================================
+%  Alden — master CV (LaTeX source of truth)
+% ===========================================================================
+%
+%  STATUS: STUB / PLACEHOLDER.
+%
+%  This file exists so the /cv/ page can ship a real, inline-viewable PDF
+%  today. Every bracketed token such as [EMAIL] or [DEGREE] is a placeholder
+%  to be replaced with real content; none of it is a real claim about Alden.
+%  Do NOT fill these in with plausible-looking invented content — the master
+%  CV is the source, not this stub.
+%
+%  Once the real master CV arrives, replace the body below (and delete the
+%  "placeholder document" notice). Nothing else needs to change: the build in
+%  ../BUILD.md and the CV layout's tab code are content-agnostic.
+%
+%  WRITING RULES (keep this file "pandoc-friendly" — see ../BUILD.md):
+%    * plain `article` + geometry + hyperref (all in texlive-latex-base/-recommended).
+%      Never switch to moderncv or an exotic template: pandoc's LaTeX -> HTML5
+%      conversion degrades badly on those, and Phase 2 renders this file as HTML
+%      on /cv/.
+%    * semantic \section{} and \itemize only.
+%    * no floats, minipages or multi-column tricks for anything that must
+%      appear in the on-page HTML view; multi-column output is fine for the
+%      PDF alone, but then it will not survive the HTML rendering.
+% ===========================================================================
+
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks]{hyperref}
+
+% --- ATS / copy-paste text layer --------------------------------------------
+% Résumé parsers and copy-paste read the PDF text layer, and T1 (EC/LModern)
+% encoding breaks it: fi and fl are emitted as single ligature glyphs with no
+% text equivalent, so "file" extracts as "le", "profile" as "prole" and
+% "efficient" as "ecient". That silently fails the literal matching an ATS does.
+%
+% Two pieces here, and which one matters is not obvious:
+%
+%   1. microtype's \DisableLigatures — stops pdfTeX emitting fi/fl as ligature
+%      glyphs at all. This is the one that actually fixes extraction.
+%   2. \pdfgentounicode — emits a ToUnicode CMap for the remaining glyphs
+%      (quotes, dashes, bullets). Good practice, but not the ligature fix.
+%
+% Measured on this file, because the obvious approaches fail:
+%   * T1 + glyphtounicode + \pdfgentounicode, no microtype -> still "prole le".
+%   * Drop T1 (default OT1) -> ligatures extract fine, but accents break
+%     ("Université naïve" extracts as "Universite ́ naı̈ve").
+%   * T1 + \DisableLigatures -> correct accents AND clean extraction. Chosen.
+%
+% Do not remove this block. After editing, verify with:
+%   pdftotext cv.pdf - | grep -i "prole le"    # must print nothing
+%
+% microtype is in texlive-latex-recommended, so this adds no new dependency,
+% and it must be loaded after fontenc. \pdfgentounicode is pdfTeX-only, hence
+% the guard.
+%
+% `expansion=false` is deliberate: microtype's font expansion needs scalable
+% fonts, and on a minimal TeX install the T1 fonts are bitmap-only, so pdfTeX
+% aborts with "auto expansion is only possible with scalable fonts" and
+% produces NO PDF. Expansion buys subtle letter-spacing refinements; the
+% build working everywhere matters more. Character protrusion (microtype's
+% main optical win) stays enabled. Turning expansion back on would require a
+% scalable font package such as lmodern/cmsuper.
+\usepackage[expansion=false]{microtype}
+\DisableLigatures{encoding = T1, family = *}
+\ifdefined\pdfgentounicode
+  \input{glyphtounicode}%
+  \pdfgentounicode=1
+\fi
+
+% This file deliberately sticks to packages in texlive-latex-base +
+% texlive-latex-recommended (fontenc, inputenc, geometry, hyperref, microtype)
+% so it compiles on a minimal install — no texlive-latex-extra, and no
+% texlive-fonts-extra (lmodern/cmsuper) required. Spacing is therefore done
+% with plain lengths instead of the enumitem/parskip packages, which would
+% otherwise pull in ~1.4 GB of dependencies for two lines of setup.
+
+% No paragraph indent; a little air between paragraphs.
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% Compact bullet lists, applied per-list (plain LaTeX: valid inside \itemize,
+% and pandoc's LaTeX reader still sees ordinary itemize blocks).
+\newcommand{\tightlist}{%
+  \setlength{\itemsep}{1pt}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\topsep}{4pt}%
+}
+
+% --- Placeholder helper -----------------------------------------------------
+% Markers are VISIBLY bracketed and italic so a placeholder can never be
+% mistaken for real content in the rendered PDF.
+\newcommand{\ph}[1]{\textit{[#1]}}
+% ---------------------------------------------------------------------------
+
+\pagestyle{empty}
+
+\begin{document}
+
+% ---- Header ---------------------------------------------------------------
+\begin{center}
+  {\Large\bfseries Alden}\\[4pt]
+  \ph{YOUR EMAIL} \textbullet\ \ph{PHONE} \textbullet\ \ph{CITY, STATE}\\[2pt]
+  \href{https://github.com/alden-g878}{github.com/alden-g878}
+  \textbullet\ \ph{LINKEDIN URL}
+\end{center}
+
+% ---- Placeholder warning (delete once real content lands) -----------------
+\vspace{4pt}
+\noindent\textbf{Placeholder document.} This PDF was generated from the stub
+LaTeX file \texttt{cv/cv.tex}. It exists so that the in-page document viewer on
+\href{https://alden-g878.github.io/cv/}{/cv/} has a real file to render. The
+interactive CV on that page is the authoritative view; this document will be
+regenerated from the master CV once it is available.
+
+% ---- Summary --------------------------------------------------------------
+\section*{Summary}
+\ph{TWO OR THREE LINES OF SUMMARY — pulled from the master CV, not invented here}
+
+% ---- Education ------------------------------------------------------------
+\section*{Education}
+\textbf{\ph{INSTITUTION}} \hfill \ph{EXPECTED GRADUATION}\\
+\ph{DEGREE}, \ph{MAJOR / CONCENTRATION}\\
+\begin{itemize}\tightlist
+  \item \ph{NOTABLE COURSEWORK — or delete this list entirely}
+\end{itemize}
+
+% ---- Skills -------------------------------------------------------------
+\section*{Skills}
+\begin{itemize}\tightlist
+  \item \textbf{Languages:} \ph{LANGUAGE LIST}
+  \item \textbf{Frameworks / Tools:} \ph{TOOL LIST}
+  \item \textbf{Other:} \ph{ANYTHING ELSE}
+\end{itemize}
+
+% ---- Experience ---------------------------------------------------------
+\section*{Experience}
+\textbf{\ph{ROLE}} \hfill \ph{START -- END OR ONGOING}\\
+\ph{ORGANISATION} \textbullet\ \ph{CONTEXT: full-time, internship, class project}
+\begin{itemize}\tightlist
+  \item \ph{OUTCOME-FOCUSED BULLET — what changed because of this work}
+  \item \ph{SECOND BULLET}
+\end{itemize}
+
+% ---- Research -----------------------------------------------------------
+\section*{Research}
+\textbf{\ph{PROJECT / PAPER TITLE}} \hfill \ph{START -- END OR ONGOING}\\
+\ph{GROUP / LAB} \textbullet\ \ph{TEAM SIZE, IF RELEVANT}
+\begin{itemize}\tightlist
+  \item \ph{RESEARCH BULLET}
+\end{itemize}
+
+% ---- Projects -----------------------------------------------------------
+\section*{Projects}
+\textbf{\ph{PROJECT NAME}} \hfill \ph{DATES}\\
+\ph{TECH STACK}
+\begin{itemize}\tightlist
+  \item \ph{WHAT IT DOES AND WHY IT IS INTERESTING}
+  \item \ph{REPO LINK, IF PUBLIC}
+\end{itemize}
+
+\end{document}

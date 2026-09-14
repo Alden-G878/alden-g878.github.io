@@ -1,0 +1,95 @@
+{% comment %}
+  ===========================================================================
+  Interactive CV body — Education / Skills / Experience.
+  ===========================================================================
+  Extracted from `_layouts/cv.html` so it can be rendered in two places
+  without duplicating markup:
+
+    * inside the "Interactive CV" tab, when a PDF exists, or
+    * directly on the page, when no PDF exists yet (no tabs, nothing to switch).
+
+  Reads only site-level data, so it needs no parameters from the caller.
+  All sections stay placeholder-gated: real content is never invented here.
+{% endcomment %}
+
+{% comment %}
+  ---- Education (from _data/education.yml) ----
+  Rendered via the shared timeline-entry include.
+{% endcomment %}
+{% if site.data.education %}
+  <section id="education">
+    <h2>Education</h2>
+    {% include timeline-entry.html
+         title=site.data.education.degree
+         org=site.data.education.institution
+         dates=site.data.education.expected_graduation %}
+    {% if site.data.education.notable_classwork and site.data.education.notable_classwork.size > 0 %}
+      {% assign first_classwork = site.data.education.notable_classwork.first %}
+      {% unless first_classwork contains "Placeholder" %}
+        <ul class="cv-classwork">
+          {% for course in site.data.education.notable_classwork %}
+            <li>{{ course }}</li>
+          {% endfor %}
+        </ul>
+      {% endunless %}
+    {% endif %}
+    {% if site.data.education.gpa %}
+      <p><strong>GPA:</strong> {{ site.data.education.gpa }}</p>
+    {% endif %}
+  </section>
+{% endif %}
+
+{% comment %}
+  ---- Skills (from _data/skills.yml) ----
+  Hidden when all entries are placeholders, so the public CV is never blank
+  noise. Populates automatically once _data/skills.yml has real content.
+{% endcomment %}
+{% if site.data.skills %}
+  <section id="skills">
+    <h2>Skills</h2>
+    {% assign skills_have_real = false %}
+    {% for category in site.data.skills %}
+      {% for item in category[1] %}
+        {% unless item contains "Placeholder" %}
+          {% assign skills_have_real = true %}
+        {% endunless %}
+      {% endfor %}
+    {% endfor %}
+    {% if skills_have_real %}
+      {% for category in site.data.skills %}
+        {% assign cat_items = category[1] | join: ", " %}
+        {% unless cat_items contains "Placeholder" %}
+          <p><strong>{{ category[0] }}:</strong> {{ cat_items }}</p>
+        {% endunless %}
+      {% endfor %}
+    {% else %}
+      <p class="notice--info">Skills will appear here once parsed from the CV.</p>
+    {% endif %}
+  </section>
+{% endif %}
+
+{% comment %}
+  ---- Experience timeline (projects + research) ----
+  Merged, sorted by date_end descending (nulls float to the top = ongoing first),
+  rendered via timeline-entry.html.
+{% endcomment %}
+<section id="experience">
+  <h2>Experience</h2>
+  {% assign cv_projects = site.projects %}
+  {% assign cv_research = site.research %}
+  {% assign timeline = cv_projects | concat: cv_research | sort: "date_end" | reverse %}
+  {% for entry in timeline %}
+    {% include timeline-entry.html
+         title=entry.title
+         org=entry.group
+         dates=entry.date_end
+         url=entry.url
+         summary=entry.summary %}
+    {% unless entry.group %}
+      <p class="timeline-context">
+        {{ entry.role }} &middot; {{ entry.context }}
+        {% if entry.team_size > 1 %} &middot; team of {{ entry.team_size }}{% endif %}
+      </p>
+    {% endunless %}
+  {% endfor %}
+</section>
