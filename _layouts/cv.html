@@ -58,16 +58,37 @@ layout: default
     <div class="cv-tabs" role="group" aria-label="Select CV view">
       <input type="radio" name="cv-view" id="cv-tab-interactive"
              class="cv-tabs__control" checked>
+      <input type="radio" name="cv-view" id="cv-tab-html"
+             class="cv-tabs__control">
       <input type="radio" name="cv-view" id="cv-tab-document"
              class="cv-tabs__control">
 
       <ul class="cv-tabs__list">
         <li><label class="cv-tabs__label" for="cv-tab-interactive">Interactive CV</label></li>
+        <li><label class="cv-tabs__label" for="cv-tab-html">Document (HTML)</label></li>
         <li><label class="cv-tabs__label" for="cv-tab-document">Document (PDF)</label></li>
       </ul>
 
       <div class="cv-pane cv-pane--interactive">
         {% include cv-interactive.html %}
+      </div>
+
+      {% comment %}
+        The HTML view is generated from cv/cv.tex by pandoc (see cv/build.sh) and
+        committed as _includes/cv-live.html, because Jekyll's `include` tag
+        raises IOError when a file is missing. Ordered before the PDF tab
+        deliberately: this view is rendered *from* the LaTeX master, so it is
+        the authoritative document view, while the PDF is the fidelity view
+        for printing and ATS parsing.
+      {% endcomment %}
+      <div class="cv-pane cv-pane--html">
+        <p class="cv-pane__hint">
+          The CV document, rendered from <code>cv/cv.tex</code>.
+          Download it <a href="{{ cv_pdf | relative_url }}">as a PDF</a>.
+        </p>
+        <div class="cv-doc">
+          {% include cv-live.html %}
+        </div>
       </div>
 
       <div class="cv-pane cv-pane--document">

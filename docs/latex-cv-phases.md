@@ -5,7 +5,13 @@
 > required" build note — Phase 2 below adopts GitHub Actions deliberately.
 >
 > **Repo:** `Alden-G878/alden-g878.github.io` (user site → `alden-g878.github.io`)
-> **Date:** 2026-09-14 · **Status:** Phase 0 complete, Phases 1–3 pending
+> **Date:** 2026-09-14 · **Status:** Phases 0–1 complete; Phase 2 built and
+> committed (workflow + CV tabs) — the only remaining step is the manual Pages
+> source switch. Phase 3 not started.
+>
+> **See also:** `phase2-implementation-plan.md` — the detailed design for
+> Phase 2, including the measured evidence and the corrections to the workflow
+> sketch below.
 
 ---
 
@@ -87,6 +93,15 @@
 
 ## Phase 2 — LaTeX master + Actions pipeline (the real proposal)
 
+> **STATUS: IMPLEMENTED** (2026-09-14), except the Pages source switch in work
+> item 3, which is a repo-settings action.
+>
+> ⚠️ **The workflow sketch below is the original proposal and is wrong in
+> several ways.** Do not copy it. It was superseded by
+> `.github/workflows/deploy.yml` after measurement; the differences are
+> summarised under the sketch, and documented in full in
+> `cv/BUILD.md` and `phase2-implementation-plan.md`.
+
 **Goal:** edit only `cv/cv.tex`; push → CI compiles both the downloadable PDF and an
 in-page HTML rendering of the LaTeX. This is the "trigger, not principle" adoption of
 GitHub Actions assessed 2026-09-14 — it is justified here because **native Pages cannot
@@ -154,6 +169,19 @@ compile LaTeX or run pandoc** (not on the plugin/tool whitelist).
 - New maintenance surface: action version bumps, Ruby pin, workflow permissions.
 - `gh` CLI is not installed locally; workflow debugging via
   `github.com/Alden-G878/alden-g878.github.io/actions` or the public API (both verified working).
+
+### What the sketch above gets wrong (measured)
+
+| Sketch says | Reality |
+|---|---|
+| `dante-ev/latex-action@v2` + apt pandoc | Different toolchain from local dev → "works in CI, broken locally". Replaced by **one `cv/build.sh`** that both the developer and CI run, using pinned Docker images (`pandoc/core:3.11`, `ubuntu:24.04`) |
+| `pandoc cv/cv.tex -f latex -t html5` | Needs **`-t html5 --shift-heading-level-by=1`** (else `\section*{}` becomes `<h1>`, colliding with the page title) and **`-f latex-auto_identifiers`** (else headings get `id`s that duplicate the interactive pane's `<section id="…">`) |
+| "Committing generated `cv-live.html` is **not** required" | **It is required.** Jekyll's `include` tag raises `IOError` when the file is missing, so a CI-only include would break every local build |
+| `uses: actions/deploy-pages@v4` inside the build job | `deploy-pages` must be its **own job** with `needs:`, `environment: github-pages`, and `permissions: {pages: write, id-token: write}` |
+| Missing | `actions/configure-pages`, the drift check, and the PDF/text-layer assertions |
+| Missing | `sass: {style: compressed}` — without it the Actions switch ships ~112 KB of CSS per page instead of ~74 KB, because the `github-pages` gem's production default is not applied when you pin `gem "jekyll"` |
+| "`enumitem`" in the LaTeX class notes | Not used, and not needed — it would pull ~1.4 GB of extra TeX dependencies for two lines of list setup |
+| `-pdf` `-outdir` | Plain `pdflatex -interaction=nonstopmode -halt-on-error`; the `chown` and `expansion=false` fixes from Phase 1 are load-bearing |
 
 ---
 

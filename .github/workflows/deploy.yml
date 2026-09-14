@@ -1,0 +1,171 @@
+# Build and deploy the site to GitHub Pages.
+#
+# This workflow is the second half of the LaTeX-CV work. The first half is
+# cv/build.sh, which compiles cv/cv.tex into the two committed artifacts:
+#
+#   assets/pdf/Alden_CV.pdf    the downloadable / fidelity / ATS view (pdflatex)
+#   _includes/cv-live.html    the in-page HTML view                (pandoc)
+#
+# CI runs that same script, so there is exactly one build path — a developer and
+# a runner produce byte-identical HTML. The artifacts stay committed because
+# native Pages cannot compile LaTeX or run pandoc, and because Jekyll's `include`
+# tag raises IOError when a file is missing, which would break every local build.
+#
+# Ordering note: cv/build.sh MUST run before `jekyll build`, since _layouts/cv.html
+# includes cv-live.html and Jekyll reads it at render time.
+#
+# See docs/phase2-implementation-plan.md and cv/BUILD.md.
+#
+# Action versions: major tags, refreshed deliberately (see §7 of the plan, "Action
+# versions rot"). These are intentionally NOT pinned to SHAs, to stay consistent
+# with how the rest of this repo tracks dependencies (the Gemfile uses `~>`
+# constraints); revisit if a supply-chain policy is adopted.
+
+name: Deploy site to Pages
+
+on:
+  # Deploys on every push to the default branch. There is no path filter: a
+  # content-only change must still redeploy, and a cv/cv.tex change must too.
+  push:
+    branches: [main]
+
+  # Manual re-run from the Actions tab — useful after flipping the Pages source
+  # (Settings -> Pages -> Source) without having to push a dummy commit.
+  workflow_dispatch:
+
+# GITHUB_TOKEN scopes needed by the Pages deploy.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and do NOT cancel an in-progress one: a cancelled
+# deploy can leave the site on an older revision than the commit that triggered
+# it. Queueing instead means the last push always wins eventually.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      # Reads the repo's Gemfile.lock (ruby 3.2 matches the local dev box).
+      # bundler-cache restores ~/.bundle/cache; with BUNDLE_PATH unset, gems
+      # install under the runner's default gem home, NOT the vendored
+      # `vendor/bundle` path used locally — which is why `bundle exec` below
+      # resolves against the CI install. The lockfile already lists
+      # x86_64-linux, so no lockfile rewrite is needed.
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+          bundler-cache: true
+
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v6
+
+      # Compiles cv/cv.tex into BOTH artifacts, overwriting the committed copies.
+      # Fails the job if pandoc emits no headings or if the PDF text layer is
+      # broken (ligatures extracting as "le") — see the self-checks in the script.
+      - name: Regenerate CV artifacts (pdfTeX + pandoc)
+        run: |
+          chmod +x cv/build.sh
+          ./cv/build.sh
+
+      # The committed copy of cv-live.html must match what cv/cv.tex produces.
+      # This is checkable because the pandoc output is byte-deterministic
+      # (verified across runs — docs/phase2-implementation-plan.md §9).
+      #
+      # `git status --porcelain` rather than `git diff --quiet`: diff compares
+      # the index against the worktree and is blind to untracked files, so it
+      # would pass for a cv-live.html that was regenerated but never `git add`ed.
+      # Porcelain reports "??" for untracked, " M" for modified and " D" for
+      # deleted, covering all three failure modes with one condition.
+      #
+      # The PDF is deliberately NOT checked: pdflatex embeds a creation
+      # timestamp, so its bytes differ on every run and any such check would be
+      # permanently red. A binary diff would also tell us nothing useful about
+      # *what* changed.
+      - name: Check for CV drift
+        run: |
+          status="$(git status --porcelain -- _includes/cv-live.html)"
+          if [ -n "$status" ]; then
+            echo "::error::_includes/cv-live.html is out of date with cv/cv.tex."
+            {
+              echo
+              echo "cv/build.sh regenerated the HTML view and it does not match the"
+              echo "committed copy, which means cv/cv.tex was edited without re-running"
+              echo "the build (or the regenerated file was never committed)."
+              echo
+              echo "git status says: $status"
+              echo
+              # Nothing to show for an untracked file, so fall back to a hint
+              # rather than printing an empty diff and looking like a false alarm.
+              if [ "${status%% *}" != "??" ]; then
+                git --no-pager diff --stat -- _includes/cv-live.html
+                echo
+              fi
+              echo "Fix locally with:  ./cv/build.sh --html-only"
+              echo "Then commit cv/cv.tex and _includes/cv-live.html together."
+            } >&2
+            exit 1
+          fi
+          echo "ok: _includes/cv-live.html matches cv/cv.tex"
+
+      # Renders with the lockfile toolchain — Jekyll 4.4.1 / kramdown 2.5.1 /
+      # rouge 4.5.1, which is NOT what native Pages used (3.10.0 / 2.4.0 /
+      # 3.30.0). That engine change is the one side effect of this workflow that
+      # can alter pages nobody touched; it was diffed and accepted before the
+      # source switch (plan §6.1).
+      #
+      # base_path is "" for a user site (alden-g878.github.io) and set for a
+      # project site, so passing it through keeps the workflow reusable as-is.
+      - name: Build with Jekyll
+        run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
+        env:
+          JEKYLL_ENV: production
+
+      # Guards the deployed output rather than the repo: these are the two
+      # failures that would otherwise ship silently. `/cv/` must exist, and no
+      # LaTeX source may reach the web root — cv/ is in _config.yml's exclude,
+      # so a regression there would be a real leak of the .tex master.
+      - name: Sanity-check the built site
+        run: |
+          test -f _site/cv/index.html || {
+            echo "::error::_site/cv/index.html is missing — the CV page did not build."
+            exit 1
+          }
+          leaks="$(find _site -name '*.tex' -o -name '*.aux' -o -name 'BUILD.md' 2>/dev/null || true)"
+          if [ -n "$leaks" ]; then
+            echo "::error::LaTeX sources or build notes leaked into _site:"
+            echo "$leaks" >&2
+            exit 1
+          fi
+          if ! grep -q "cv-doc" _site/cv/index.html; then
+            echo "::error::/cv/ built without the HTML document pane."
+            exit 1
+          fi
+          echo "ok: _site/cv/index.html present, no source leakage, HTML pane rendered"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site/
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

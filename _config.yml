@@ -47,6 +47,22 @@ author:
 # Minimal Mistakes is not on the GitHub Pages theme whitelist, so it is
 # loaded via remote_theme instead of `theme:`.
 remote_theme: mmistakes/minimal-mistakes@4.28.1
+
+# Sass output style.
+#
+# Native GitHub Pages renders with the `github-pages` gem, which injects
+# `sass: {style: compressed}` in production (GitHubPages::Configuration::
+# PRODUCTION_DEFAULTS). The plain `jekyll` gem in this Gemfile defaults to
+# `:expanded` (jekyll-sass-converter `sass_style`), which emits ~112 KB of
+# CSS instead of ~74 KB — a visible payload/latency regression for every
+# visitor once the Pages source is switched to GitHub Actions.
+#
+# Setting it explicitly keeps the deployed CSS byte-identical to what
+# "Deploy from a branch" was already serving, so the Actions switch is
+# output-neutral. Do not remove without re-measuring.
+sass:
+  style: compressed
+
 plugins:
   - jekyll-feed
   - jekyll-remote-theme

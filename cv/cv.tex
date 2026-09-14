@@ -23,6 +23,8 @@
 %    * no floats, minipages or multi-column tricks for anything that must
 %      appear in the on-page HTML view; multi-column output is fine for the
 %      PDF alone, but then it will not survive the HTML rendering.
+%    * dates and trailing metadata go through \cvwhen{} (defined below), never
+%      bare after \hfill — pandoc silently drops \hfill, losing the separation.
 % ===========================================================================
 
 \documentclass[11pt,letterpaper]{article}
@@ -97,6 +99,20 @@
 \newcommand{\ph}[1]{\textit{[#1]}}
 % ---------------------------------------------------------------------------
 
+% --- Date / meta span ------------------------------------------------------
+% Wrapper for the dates and other trailing metadata on an entry.
+%
+% Why not just \emph{} or bare text: this file renders to HTML as well as PDF,
+% and pandoc DROPS \hfill entirely, so `\textbf{Role} \hfill 2027` becomes
+% `<strong>Role</strong> 2027` in the on-page view — the date loses its
+% separation from the title with nothing left to style. \textsf{} survives the
+% conversion as `<span class="sans-serif">`, which gives the HTML a hook
+% (`.cv-doc .sans-serif` in assets/css/main.scss) and keeps the PDF unchanged.
+%
+% Write dates as:  \textbf{\ph{ROLE}} \hfill \cvwhen{\ph{DATES}}
+\newcommand{\cvwhen}[1]{\textsf{#1}}%
+% ---------------------------------------------------------------------------
+
 \pagestyle{empty}
 
 \begin{document}
@@ -123,7 +139,7 @@ regenerated from the master CV once it is available.
 
 % ---- Education ------------------------------------------------------------
 \section*{Education}
-\textbf{\ph{INSTITUTION}} \hfill \ph{EXPECTED GRADUATION}\\
+\textbf{\ph{INSTITUTION}} \hfill \cvwhen{\ph{EXPECTED GRADUATION}}\\
 \ph{DEGREE}, \ph{MAJOR / CONCENTRATION}\\
 \begin{itemize}\tightlist
   \item \ph{NOTABLE COURSEWORK — or delete this list entirely}
@@ -139,7 +155,7 @@ regenerated from the master CV once it is available.
 
 % ---- Experience ---------------------------------------------------------
 \section*{Experience}
-\textbf{\ph{ROLE}} \hfill \ph{START -- END OR ONGOING}\\
+\textbf{\ph{ROLE}} \hfill \cvwhen{\ph{START -- END OR ONGOING}}\\
 \ph{ORGANISATION} \textbullet\ \ph{CONTEXT: full-time, internship, class project}
 \begin{itemize}\tightlist
   \item \ph{OUTCOME-FOCUSED BULLET — what changed because of this work}
@@ -148,7 +164,7 @@ regenerated from the master CV once it is available.
 
 % ---- Research -----------------------------------------------------------
 \section*{Research}
-\textbf{\ph{PROJECT / PAPER TITLE}} \hfill \ph{START -- END OR ONGOING}\\
+\textbf{\ph{PROJECT / PAPER TITLE}} \hfill \cvwhen{\ph{START -- END OR ONGOING}}\\
 \ph{GROUP / LAB} \textbullet\ \ph{TEAM SIZE, IF RELEVANT}
 \begin{itemize}\tightlist
   \item \ph{RESEARCH BULLET}
@@ -156,7 +172,7 @@ regenerated from the master CV once it is available.
 
 % ---- Projects -----------------------------------------------------------
 \section*{Projects}
-\textbf{\ph{PROJECT NAME}} \hfill \ph{DATES}\\
+\textbf{\ph{PROJECT NAME}} \hfill \cvwhen{\ph{DATES}}\\
 \ph{TECH STACK}
 \begin{itemize}\tightlist
   \item \ph{WHAT IT DOES AND WHY IT IS INTERESTING}

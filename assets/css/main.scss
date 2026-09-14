@@ -216,6 +216,7 @@
 
 /* The inactive label is still a valid tab, but should read as secondary. */
 #cv-tab-interactive:checked ~ .cv-tabs__list label[for="cv-tab-interactive"],
+#cv-tab-html:checked ~ .cv-tabs__list label[for="cv-tab-html"],
 #cv-tab-document:checked ~ .cv-tabs__list label[for="cv-tab-document"] {
   background: #7a8288;
   border-color: #7a8288;
@@ -224,9 +225,10 @@
 
 /* Focus ring is drawn on the label, since the radio itself is clipped.
    Must be scoped per-input: a bare `:focus-visible ~ .cv-tabs__list label`
-   matches BOTH labels whenever either radio has focus, outlining the whole
+   matches EVERY label whenever any radio has focus, outlining the whole
    tab bar. Pair each input with the label that points at it. */
 #cv-tab-interactive:focus-visible ~ .cv-tabs__list label[for="cv-tab-interactive"],
+#cv-tab-html:focus-visible ~ .cv-tabs__list label[for="cv-tab-html"],
 #cv-tab-document:focus-visible ~ .cv-tabs__list label[for="cv-tab-document"] {
   outline: 2px solid #7a8288;
   outline-offset: 2px;
@@ -239,8 +241,57 @@
 }
 
 #cv-tab-interactive:checked ~ .cv-pane--interactive,
+#cv-tab-html:checked ~ .cv-pane--html,
 #cv-tab-document:checked ~ .cv-pane--document {
   display: block;
+}
+
+/* ---- Document (HTML) view -----------------------------------------------
+   The markup inside `.cv-doc` is pandoc's output from cv/cv.tex, not ours:
+   bare <h2>/<p>/<ul> in document order. Everything is scoped to .cv-doc so it
+   cannot leak into the rest of the site, and headings are restyled to match the
+   interactive tab's <h2> rather than inheriting MM's page typography. */
+
+.cv-doc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.cv-doc h2 {
+  font-size: 1.15rem;
+  margin: 1.75rem 0 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.cv-doc h2:first-child {
+  margin-top: 0;
+}
+
+.cv-doc p {
+  margin: 0 0 0.75rem;
+}
+
+.cv-doc ul {
+  margin: 0.25rem 0 1rem 1.25rem;
+}
+
+.cv-doc li {
+  margin-bottom: 0.15rem;
+}
+
+/* pandoc turns \cvwhen{} (\textsf) into <span class="sans-serif">. Style it so
+   dates read as metadata rather than as part of the preceding title — pandoc
+   drops \hfill, so without this the two run together with no separation. */
+.cv-doc .sans-serif {
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* pandoc wraps the centred header block from cv.tex in this div. */
+.cv-doc .center {
+  text-align: center;
+  margin-bottom: 1.25rem;
 }
 
 /* ---- Embedded PDF ------------------------------------------------------- */
