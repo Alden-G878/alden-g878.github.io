@@ -1,7 +1,12 @@
 ---
 layout: default
 ---
-<article class="page--cv" itemscope itemtype="https://schema.org/Person">
+{%- assign locale = page.locale | default: layout.locale | default: site.locale -%}
+
+<div id="main" role="main">
+  {% include sidebar.html locale=locale %}
+
+  <article class="page--cv" itemscope itemtype="https://schema.org/Person">
   <header>
     <h1 class="page__title">Alden — Curriculum Vitae</h1>
     {% comment %}
@@ -102,3 +107,4 @@ layout: default
     {% endfor %}
   </section>
 </article>
+</div>
