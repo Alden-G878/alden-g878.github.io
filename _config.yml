@@ -18,6 +18,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
+locale: "en-US"
 title: Your awesome title
 email: your-email@example.com
 description: >- # this means to ignore newlines until "baseurl:"
@@ -25,16 +26,61 @@ description: >- # this means to ignore newlines until "baseurl:"
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://alden-g878.github.io" # the base hostname & protocol for your site
 twitter_username: jekyllrb
-github_username:  jekyll
+github_username: alden-g878
+
+# Minimal Mistakes theme settings
+minimal_mistakes_skin: "default" # "default", "air", "aqua", "contrast", "dark", "dirt", "mint", "neon", "plum", "sunrise"
+
+# Author profile shown in the sidebar
+author:
+  name: "Alden"
+  avatar: # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
+  bio: # short bio shown under the avatar
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/alden-g878"
 
 # Build settings
-theme: minima
-#remote_theme: pages-themes/cayman@v0.2.0
+# Minimal Mistakes is not on the GitHub Pages theme whitelist, so it is
+# loaded via remote_theme instead of `theme:`.
+remote_theme: mmistakes/minimal-mistakes@4.28.1
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
+  - jekyll-include-cache
+
+# Minimal Mistakes defaults: enable search
+search: true
+lunr:
+  search_within_pages: true
+
+# Site pages live in _pages/
+include:
+  - _pages
+
+defaults:
+  # all pages (about, archives, 404, etc.)
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      author_profile: true
+      sidebar:
+        nav: "main"
+  # posts
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: single
+      author_profile: true
+      read_time: true
+      share: true
+      related: true
 
 # Exclude from processing.
 # The following items will not be processed, by default.
