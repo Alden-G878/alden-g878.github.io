@@ -1,8 +1,14 @@
 main:
   - title: "Home"
     url: /
+  - title: "Portfolio"
+    url: /portfolio/
+  - title: "CV"
+    url: /cv/
   - title: "About"
     url: /about/
+  - title: "Contact"
+    url: /contact/
   - title: "Posts by Year"
     url: /year-archive/
   - title: "Categories"

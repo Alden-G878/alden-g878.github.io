@@ -1,0 +1,80 @@
+---
+layout: default
+---
+{% comment %}
+  Individual project page. Front matter defaults in _config.yml already set
+  layout: project for the projects collection.
+{% endcomment %}
+<article class="project-detail" itemscope itemtype="https://schema.org/CreativeWork">
+  <header class="project-header">
+    <h1 class="page__title" itemprop="headline">{{ page.title }}</h1>
+
+    {% if page.status == 'ongoing' %}
+      <span class="badge badge--warning">Ongoing</span>
+    {% elsif page.status == 'in-preparation' %}
+      <span class="badge badge--info">In preparation</span>
+    {% else %}
+      <span class="badge badge--success">Complete</span>
+    {% endif %}
+
+    <p class="project-meta">
+      {% if page.date_start %}
+        {{ page.date_start | date: "%b %Y" }} &ndash;
+        {% if page.date_end %}{{ page.date_end | date: "%b %Y" }}{% else %}present{% endif %}
+      {% endif %}
+      {% if page.role %} &middot; {{ page.role }}{% endif %}
+      {% if page.team_size and page.team_size > 1 %} &middot; team of {{ page.team_size }}{% endif %}
+    </p>
+  </header>
+
+  {% if page.summary %}
+    <p class="project-summary" itemprop="description">{{ page.summary }}</p>
+  {% endif %}
+
+  {% if page.metrics and page.metrics.size > 0 %}
+    {% comment %}
+      Rendered only if real quantified results exist. Entries with
+      notes_missing_data: true should have empty metrics — never fabricated.
+    {% endcomment %}
+    <section class="project-metrics">
+      <h2>Results</h2>
+      <ul>
+        {% for m in page.metrics %}
+          <li>{{ m }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {% comment %}
+    ---- Links (only if repo exists) ----
+  {% endcomment %}
+  {% if page.repo_url %}
+    <p>
+      <a class="btn btn--primary" href="{{ page.repo_url }}">View on GitHub</a>
+    </p>
+  {% endif %}
+
+  {{ content }}
+
+  {% comment %}
+    ---- Tech stack + categories as chips ----
+  {% endcomment %}
+  {% if page.tech_stack and page.tech_stack.size > 0 %}
+    <section class="project-meta">
+      <h2>Tech Stack</h2>
+      {% for tech in page.tech_stack %}
+        <span class="chip chip--tech">{{ tech }}</span>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  {% if page.categories and page.categories.size > 0 %}
+    <section class="project-meta">
+      <h2>Categories</h2>
+      {% for cat in page.categories %}
+        <a class="chip chip--category" href="{{ '/portfolio/' | relative_url }}">{{ cat | replace: '-', ' ' }}</a>
+      {% endfor %}
+    </section>
+  {% endif %}
+</article>

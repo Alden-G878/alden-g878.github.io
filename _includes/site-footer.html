@@ -1,0 +1,26 @@
+{% comment %}
+  Site footer include with contact links from _data/links.yml.
+  Named site-footer.html (NOT footer.html) to avoid silently shadowing the
+  Minimal Mistakes theme's own footer.html which is loaded via include_cached
+  in default.html.
+{% endcomment %}
+<footer class="site-footer-custom">
+  <div class="site-footer-custom__links">
+    {% if site.data.links.email %}
+      <a href="mailto:{{ site.data.links.email }}">Email</a>
+    {% endif %}
+    {% if site.data.links.github %}
+      <a href="{{ site.data.links.github }}">GitHub</a>
+    {% endif %}
+    {% if site.data.links.linkedin %}
+      <a href="{{ site.data.links.linkedin }}">LinkedIn</a>
+    {% endif %}
+    {% if site.data.links.resume_pdf %}
+      <a href="{{ site.data.links.resume_pdf | relative_url }}">CV (PDF)</a>
+    {% endif %}
+  </div>
+  <p class="site-footer-custom__note">
+    Built with <a href="https://jekyllrb.com/">Jekyll</a> &amp;
+    <a href="https://mmistakes.github.io/minimal-mistakes/">Minimal Mistakes</a>.
+  </p>
+</footer>

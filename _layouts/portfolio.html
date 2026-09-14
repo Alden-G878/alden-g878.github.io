@@ -1,0 +1,97 @@
+---
+layout: archive
+---
+{%- assign locale = page.locale | default: layout.locale | default: site.locale -%}
+
+<div id="main" role="main">
+  {% include sidebar.html locale=locale %}
+
+  <div class="archive">
+    {% unless page.header.overlay_color or page.header.overlay_image %}
+      {% if page.title %}
+        <h1 id="page-title" class="page__title">{{ page.title }}</h1>
+      {% endif %}
+    {% endunless %}
+    {{ content }}
+
+    {% comment %}
+      Filterable portfolio grid. Filter chips come from the union of `categories`
+      across both collections (computed in _data via Liquid in cv/portfolio pages —
+      here we build them inline and toggle visibility with plain JS, no backend).
+    {% endcomment %}
+
+    {% comment %} 1. Union of categories across both collections {% endcomment %}
+    {% assign all_categories = "" | split: "" %}
+    {% for entry in site.projects %}
+      {% for cat in entry.categories %}
+        {% unless all_categories contains cat %}
+          {% assign all_categories = all_categories | push: cat %}
+        {% endunless %}
+      {% endfor %}
+    {% endfor %}
+    {% for entry in site.research %}
+      {% for cat in entry.categories %}
+        {% unless all_categories contains cat %}
+          {% assign all_categories = all_categories | push: cat %}
+        {% endunless %}
+      {% endfor %}
+    {% endfor %}
+
+    {% comment %} 2. Flagship entries always render first {% endcomment %}
+    {% assign flagship_projects = site.projects | where: "flagship", true %}
+    {% assign flagship_research = site.research | where: "flagship", true %}
+    {% assign flagship = flagship_projects | concat: flagship_research %}
+    {% assign flagship_slugs = flagship | map: "relative_path" %}
+    {% assign combined = site.projects | concat: site.research %}
+    {% assign rest = combined | sort: "date_end" | reverse %}
+
+    <div class="portfolio-filters" id="portfolio-filters">
+      <button class="btn btn--primary filter-chip active" data-category="all">
+        All
+      </button>
+      {% for cat in all_categories %}
+        <button class="btn filter-chip" data-category="{{ cat }}">
+          {{ cat | replace: '-', ' ' }}
+        </button>
+      {% endfor %}
+    </div>
+
+    <div class="grid grid--entries portfolio-grid" id="portfolio-grid">
+      {% for entry in flagship %}
+        {% include project-card.html entry=entry %}
+      {% endfor %}
+      {% for entry in rest %}
+        {% unless flagship_slugs contains entry.relative_path %}
+          {% include project-card.html entry=entry %}
+        {% endunless %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Client-side filtering: toggle .hidden by data-category; no backend needed.
+  (function () {
+    var container = document.getElementById('portfolio-grid');
+    if (!container) return;
+    var cards = container.querySelectorAll('.project-card[data-categories]');
+    var chips = document.querySelectorAll('#portfolio-filters .filter-chip');
+
+    function applyFilter(category) {
+      cards.forEach(function (card) {
+        var cats = (card.getAttribute('data-categories') || '').split(/\s+/);
+        var show = category === 'all' || cats.indexOf(category) !== -1;
+        card.style.display = show ? '' : 'none';
+      });
+      chips.forEach(function (c) {
+        c.classList.toggle('active', c.getAttribute('data-category') === category);
+      });
+    }
+
+    chips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        applyFilter(chip.getAttribute('data-category'));
+      });
+    });
+  })();
+</script>

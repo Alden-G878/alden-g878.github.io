@@ -1,0 +1,13 @@
+# Shared category vocabulary — keep consistent across _projects/ and _research/
+# so portfolio filtering works. Referenced by both collections' front matter.
+categories:
+  - rtl-design
+  - verification
+  - computer-architecture
+  - embedded-systems
+  - hardware-acceleration
+  - analog-mixed-signal
+  - asic-design
+  - fpga
+  - pcb-eda
+  - leadership

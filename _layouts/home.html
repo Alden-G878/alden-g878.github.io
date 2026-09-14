@@ -1,0 +1,40 @@
+---
+layout: archive
+---
+{%- assign locale = page.locale | default: layout.locale | default: site.locale -%}
+
+<div id="main" role="main">
+  {% include sidebar.html locale=locale %}
+
+  <div class="archive">
+    {% unless page.header.overlay_color or page.header.overlay_image %}
+      {% if page.title %}
+        <h1 id="page-title" class="page__title">{{ page.title }}</h1>
+      {% endif %}
+    {% endunless %}
+    {{ content }}
+
+    {% comment %}
+      Flagship projects + research, rendered via the shared project-card include.
+      Sorted by date_end desc; ongoing (null) entries naturally float to the top.
+    {% endcomment %}
+    {% assign flagship_projects = site.projects | where: "flagship", true %}
+    {% assign flagship_research = site.research | where: "flagship", true %}
+    {% assign flagship = flagship_projects | concat: flagship_research
+                   | sort: "date_end" | reverse %}
+
+    {% if flagship.size > 0 %}
+      <h3 class="archive__subtitle">Featured Projects</h3>
+      <div class="grid grid--entries">
+        {% for entry in flagship %}
+          {% include project-card.html entry=entry %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="notice--info">
+        No flagship projects flagged yet — <code>flagship: true</code> in a collection
+        file's front matter to surface it here.
+      </p>
+    {% endif %}
+  </div>
+</div>

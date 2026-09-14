@@ -1,0 +1,7 @@
+# Contact + resume paths. TODO(owner): confirm handles/handles once CV is parsed.
+github: "https://github.com/alden-g878"
+linkedin: null # TODO: fill
+email: null # TODO: fill
+location: null # TODO: fill
+# Static, ATS-ready PDF — manually exported, kept in sync by hand (not auto-generated).
+resume_pdf: "/assets/pdf/Alden_CV.pdf"

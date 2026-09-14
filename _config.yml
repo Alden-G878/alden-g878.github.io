@@ -51,6 +51,8 @@ plugins:
   - jekyll-feed
   - jekyll-remote-theme
   - jekyll-include-cache
+  - jekyll-seo-tag
+  - jekyll-sitemap
 
 # Minimal Mistakes defaults: enable search
 search: true
@@ -60,6 +62,20 @@ lunr:
 # Site pages live in _pages/
 include:
   - _pages
+
+# CV + portfolio content: one file per project / research entry.
+# Add a file once -> it shows up on Portfolio, CV, and (if flagship) Home.
+# `output: true` publishes each entry at /projects/<slug>/ and /research/<slug>/.
+# Placeholder entries ship with `published: false` until the master CV is parsed.
+collections:
+  projects:
+    output: true
+    permalink: /:collection/:name/
+    sort_by: date_end
+  research:
+    output: true
+    permalink: /:collection/:name/
+    sort_by: date_end
 
 defaults:
   # all pages (about, archives, 404, etc.)
@@ -81,6 +97,24 @@ defaults:
       read_time: true
       share: true
       related: true
+  # personal / class projects
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: project
+      author_profile: false
+      share: false
+      read_time: false
+  # research entries
+  - scope:
+      path: ""
+      type: research
+    values:
+      layout: research
+      author_profile: false
+      share: false
+      read_time: false
 
 # Exclude from processing.
 # The following items will not be processed, by default.

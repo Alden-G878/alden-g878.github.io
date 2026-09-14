@@ -1,0 +1,61 @@
+---
+layout: default
+---
+{% comment %}
+  Individual research page. Front matter defaults in _config.yml already set
+  layout: research for the research collection.
+{% endcomment %}
+<article class="research-detail" itemscope itemtype="https://schema.org/ScholarlyArticle">
+  <header class="project-header">
+    <h1 class="page__title" itemprop="headline">{{ page.title }}</h1>
+
+    {% if page.status == 'ongoing' %}
+      <span class="badge badge--warning">Ongoing</span>
+    {% elsif page.publication_status == 'submitted' %}
+      <span class="badge badge--info">Submitted</span>
+    {% elsif page.publication_status == 'in-preparation' %}
+      <span class="badge badge--info">In preparation</span>
+    {% elsif page.publication_status == 'published' %}
+      <span class="badge badge--success">Published</span>
+    {% endif %}
+
+    <p class="project-meta">
+      {% if page.date_start %}
+        {{ page.date_start | date: "%b %Y" }} &ndash;
+        {% if page.date_end %}{{ page.date_end | date: "%b %Y" }}{% else %}present{% endif %}
+      {% endif %}
+      {% if page.pi %} &middot; PI: {{ page.pi }}{% endif %}
+    </p>
+
+    {% if page.group %}
+      <p class="project-group">{{ page.group }}</p>
+    {% endif %}
+  </header>
+
+  {% if page.summary %}
+    <p class="project-summary" itemprop="description">{{ page.summary }}</p>
+  {% endif %}
+
+  {{ content }}
+
+  {% comment %}
+    ---- Tech stack + categories ----
+  {% endcomment %}
+  {% if page.tech_stack and page.tech_stack.size > 0 %}
+    <section class="project-meta">
+      <h2>Tools &amp; Processes</h2>
+      {% for tech in page.tech_stack %}
+        <span class="chip chip--tech">{{ tech }}</span>
+      {% endfor %}
+    </section>
+  {% endif %}
+
+  {% if page.categories and page.categories.size > 0 %}
+    <section class="project-meta">
+      <h2>Categories</h2>
+      {% for cat in page.categories %}
+        <a class="chip chip--category" href="{{ '/portfolio/' | relative_url }}">{{ cat | replace: '-', ' ' }}</a>
+      {% endfor %}
+    </section>
+  {% endif %}
+</article>

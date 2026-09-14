@@ -1,0 +1,41 @@
+{% comment %}
+  One portfolio/home card. Expects `entry` (a collection document) passed in.
+  Renders flagship badge, summary, tech chips, and links to the detail page.
+{% endcomment %}
+<div class="project-card" data-categories="{{ entry.categories | join: ' ' }}">
+  <div class="project-card__header">
+    <h3 class="project-card__title">
+      <a href="{{ entry.url | relative_url }}">{{ entry.title }}</a>
+    </h3>
+    {% if entry.flagship %}
+      <span class="badge badge--star">★ Featured</span>
+    {% endif %}
+    {% if entry.status == 'ongoing' %}
+      <span class="badge badge--warning">Ongoing</span>
+    {% endif %}
+  </div>
+
+  {% if entry.summary %}
+    <p class="project-card__summary">{{ entry.summary }}</p>
+  {% endif %}
+
+  {% if entry.tech_stack and entry.tech_stack.size > 0 %}
+    <div class="project-card__tech">
+      {% for tech in entry.tech_stack %}
+        <span class="chip chip--tech">{{ tech }}</span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <p class="project-card__meta">
+    {% if entry.date_start %}
+      {{ entry.date_start | date: "%b %Y" }} &ndash;
+      {% if entry.date_end %}{{ entry.date_end | date: "%b %Y" }}{% else %}present{% endif %}
+    {% endif %}
+    {% if entry.role %} &middot; {{ entry.role }}{% endif %}
+  </p>
+
+  {% if entry.repo_url %}
+    <a class="project-card__repo" href="{{ entry.repo_url }}">GitHub &rarr;</a>
+  {% endif %}
+</div>

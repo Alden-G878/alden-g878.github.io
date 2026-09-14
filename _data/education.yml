@@ -1,0 +1,10 @@
+# Institution, degree, classwork — single source of truth for the CV page.
+# TODO(owner): fill expected graduation, GPA (only if you want it public),
+# and notable classwork once the master CV is parsed.
+institution: "Carnegie Mellon University"
+degree: "B.S. Computer Engineering" # TODO: confirm against CV
+expected_graduation: null # TODO: fill from CV (e.g. 2027-05)
+gpa: null # intentionally null — shown on CV only if provided
+notable_classwork:
+  # TODO: from CV
+  - "[Placeholder — populate from master CV]"

@@ -16,6 +16,9 @@ group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
   gem "jekyll-remote-theme"
   gem "jekyll-include-cache"
+  # Whitelisted on GitHub Pages; recommended by the site handoff spec.
+  gem "jekyll-seo-tag"
+  gem "jekyll-sitemap"
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem

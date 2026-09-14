@@ -1,0 +1,26 @@
+# Nested by category; used by both the CV skills block and the portfolio filter chips.
+# TODO(owner): confirm exact items once the master CV is parsed.
+# Keys mirror the handoff's vocabulary; values are skill lists.
+"RTL Design":
+  - "[Placeholder — populate from master CV]"
+
+"Verification":
+  - "[Placeholder — populate from master CV]"
+
+"EDA":
+  - "[Placeholder — populate from master CV]"
+
+"Computer Architecture":
+  - "[Placeholder — populate from master CV]"
+
+"Embedded Systems":
+  - "[Placeholder — populate from master CV]"
+
+"Hardware Acceleration":
+  - "[Placeholder — populate from master CV]"
+
+"Languages":
+  - "[Placeholder — populate from master CV]"
+
+"Tools":
+  - "[Placeholder — populate from master CV]"
