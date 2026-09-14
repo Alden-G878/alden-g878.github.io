@@ -4,7 +4,12 @@ layout: default
 {% comment %}
   Individual research page. Front matter defaults in _config.yml already set
   layout: research for the research collection.
+
+  Full-width layout (no sidebar): wrap in #main for the skip-link target but
+  do NOT add the theme's `page` class — that class reserves the 200px sidebar
+  gutter via float/width rules.
 {% endcomment %}
+<div id="main" role="main">
 <article class="research-detail" itemscope itemtype="https://schema.org/ScholarlyArticle">
   <header class="project-header">
     <h1 class="page__title" itemprop="headline">{{ page.title }}</h1>
@@ -59,3 +64,4 @@ layout: default
     </section>
   {% endif %}
 </article>
+</div>

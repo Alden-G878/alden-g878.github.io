@@ -4,7 +4,12 @@ layout: default
 {% comment %}
   Individual project page. Front matter defaults in _config.yml already set
   layout: project for the projects collection.
+
+  Full-width layout (no sidebar): wrap in #main for the skip-link target but
+  do NOT add the theme's `page` class — that class reserves the 200px sidebar
+  gutter via float/width rules.
 {% endcomment %}
+<div id="main" role="main">
 <article class="project-detail" itemscope itemtype="https://schema.org/CreativeWork">
   <header class="project-header">
     <h1 class="page__title" itemprop="headline">{{ page.title }}</h1>
@@ -78,3 +83,4 @@ layout: default
     </section>
   {% endif %}
 </article>
+</div>
