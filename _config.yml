@@ -132,6 +132,13 @@ defaults:
 #   - Gemfile.lock
 #   - node_modules/
 #   - vendor/bundle/
+
+# Keep Jekyll from converting placeholder/template docs into public pages.
+# (Templates and placeholders already use `published: false`; this is a
+# second line of defense and also keeps future scratch files out of _site.)
+exclude:
+  - "*.psd"
+  - "*.sh"
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
