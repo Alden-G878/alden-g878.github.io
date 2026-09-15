@@ -103,7 +103,38 @@ temporarily published:
 > sidebar is present. `#main` is needed **whenever** there is a skip link, which
 > is always.
 
-## 4. A Liquid pipe argument cannot be parenthesized
+## 4. A layout chaining to `archive` must emit `{{ content }}` or the page body vanishes
+
+Because layouts chain, `{{ content }}` inside the theme's `archive.html` refers
+to **the chained layout's rendered output** — not to the Markdown body. So a
+layout that inherits from `archive` and never calls `{{ content }}` silently
+discards its page's body text. No error, no warning, and the file still exists;
+the content simply never appears.
+
+This actually happened: `portfolio.md`'s intro paragraph rendered **0 times** in
+the built page. `_layouts/portfolio.html` now calls `{{ content }}` before
+rendering the grid.
+
+```liquid
+{{ content }}   {# the page body from portfolio.md #}
+
+{% comment %} then the grid / empty state {% endcomment %}
+```
+
+**Affected:** `_layouts/portfolio.html` — it has body text to render.
+`_layouts/home.html` is structurally identical but `index.markdown` has no body,
+so nothing is lost there. `cv.html` and the detail layouts do call
+`{{ content }}`.
+
+Check for it by comparing a page's body text against the built output:
+
+```bash
+bundle exec jekyll build
+# take a distinctive phrase from the .md file's body and confirm it survived
+grep -c 'All hardware/RTL projects' _site/portfolio/index.html   # expect: 1
+```
+
+## 5. A Liquid pipe argument cannot be parenthesized
 
 `{% assign x = a | concat: (b) %}` is a **syntax error** in Liquid. The classic
 form `| concat: b` works and is what these templates use, but any expression
@@ -123,7 +154,7 @@ expressions are kept readable.
 **Affected:** `_layouts/home.html`, `_layouts/portfolio.html`,
 `_includes/cv-interactive.html` — all three use the temp-variable pattern.
 
-## 5. A `.bak` file inside a collection directory becomes a document
+## 6. A `.bak` file inside a collection directory becomes a document
 
 `sed -i.bak` writes its backup **into the same directory**, and Jekyll reads
 every file in `_projects/` or `_research/` as a collection document — regardless

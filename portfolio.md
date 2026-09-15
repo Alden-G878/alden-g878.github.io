@@ -6,5 +6,5 @@ permalink: /portfolio/
 classes: wide
 ---
 
-All hardware/RTL projects and research, filterable by category. Flagship
-entries are pinned first regardless of the active filter.
+All hardware/RTL projects and research. Flagship entries are pinned first, and
+the grid is filterable by category once there are entries to filter.
