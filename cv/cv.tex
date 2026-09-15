@@ -27,8 +27,11 @@
 %      interleaving the text layer, which ATS parsers read.
 %    * dates and trailing metadata go through \cvwhen{}, never bare after
 %      \hfill — pandoc silently drops \hfill, losing the separation.
-%    * use ASCII "--" for date ranges, not an en/em dash: it extracts cleanly
-%      for ATS matching and avoids PDFDocEncoding surprises in metadata.
+%    * date ranges use a plain ASCII "-" with spaces around it, NOT "--".
+%      "--" typesets an en dash (U+2013), which puts a non-ASCII character in
+%      the text layer for no benefit; a literal en/em dash is worse. ASCII
+%      extracts cleanly for ATS matching and avoids PDFDocEncoding surprises
+%      in metadata.
 % ===========================================================================
 
 \documentclass[10pt,letterpaper]{article}
@@ -36,11 +39,15 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
-% Margins are measured, not guessed: the master CV uses ~0.5in, which fits its
-% content in 3 pages. Rendering the same content with the default 1in margins
-% needed 5 — a real readability regression, since the master CV is the format
-% recruiters already expect. 0.6in gives a text width within a few points of
-% the master CV's while keeping a comfortable margin.
+% Margins are measured, not guessed. The master CV uses ~0.5in and runs 3
+% pages; this file tightens to 0.25in, which fits the same content in 2 pages.
+% Rendering it with the default 1in margins needed 5 — a real readability
+% regression, since the master CV is the format recruiters already expect.
+%
+% So the PDF is deliberately DENSER than the master CV (2 pages vs 3). That is
+% a knowing trade: the extra page came from the margin, not from dropping
+% content. If a posting asks for a 3-page CV, loosen margin back toward 0.5in
+% rather than re-adding anything.
 %
 % Note this is deliberately NOT solved by shrinking the font. Dropping to a
 % smaller base size would change every EC font size used, invalidating the
@@ -183,7 +190,7 @@
 % with the plain form, versus the intended tighter spacing with the starred one.
 %
 % The values below are the LEAST aggressive of the settings that fit the CV in
-% 3 pages, matching the master CV it mirrors. Do not tighten further without
+% 2 pages (the master CV it mirrors runs 3). Do not tighten further without
 % re-checking legibility — the aim is a readable CV, not a short one.
 \newcommand{\cvsection}[1]{%
   \vspace*{-11pt}%
@@ -462,8 +469,8 @@ HackerFab, Carnegie Mellon University \hfill \cvwhen{Sep 2025 - Dec 2025}
     hardware threads.
   \item Leveraged arithmetic properties of numerical representation to bypass
     expensive computations.
-  \item Custom hardware for square roots improved cycles per calculation from
-    11 to 1.
+  \item Custom multiplication hardware reduced cycles per operation from 32
+    to 1.
 \end{itemize}
 
 \entrysep

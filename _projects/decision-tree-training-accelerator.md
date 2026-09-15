@@ -13,12 +13,12 @@ categories:
 tech_stack:
   - "decision trees"
   - "Gini score"
-  - "square root"
+  - "custom multipliers"
 flagship: false
 summary: >
-  Hardware threads accelerating decision-tree training, including custom square-root hardware that cut cycles per calculation from 11 to 1.
+  Hardware threads accelerating decision-tree training, including custom multiplication hardware that cut cycles per operation from 32 to 1.
 metrics:
-  - "Cycles per square-root calculation improved from 11 to 1"
+  - "Cycles per operation reduced from 32 to 1"
 notes_missing_data: false
 ---
 
@@ -28,4 +28,4 @@ notes_missing_data: false
 
 - Leveraged arithmetic properties of numerical representation to bypass expensive computations
 
-- Custom hardware for square roots improved cycles per calculation from 11 to 1
+- Custom multiplication hardware reduced cycles per operation from 32 to 1
