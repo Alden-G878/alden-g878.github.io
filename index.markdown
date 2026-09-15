@@ -51,6 +51,7 @@ open to industry roles between degrees.
 ## Where to look next
 
 - [**Portfolio**]({{ "/portfolio/" | relative_url }}) — every project, filterable by category
+- [**Leadership**]({{ "/leadership/" | relative_url }}) — teaching and club roles
 - [**CV**]({{ "/cv/" | relative_url }}) — the complete record, as an interactive page or a PDF
 - [**Contact**]({{ "/contact/" | relative_url }}) — how to reach me
 

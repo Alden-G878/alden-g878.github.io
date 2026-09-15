@@ -190,6 +190,36 @@ Jekyll still ingests it.
 
 ---
 
+## 7. A YAML file in `_data/` must not use the same indentation style as another one
+
+`_data/navigation.yml` uses **two** spaces for the list dash and four for the key
+beneath it:
+
+```yaml
+main:
+  - title: "Home"
+    url: /
+```
+
+The other data files (`_data/education.yml`, `_data/skills.yml`) are not lists of
+that shape, so a search-and-replace written against four-space list indentation
+silently matches nothing in `navigation.yml`. Editing it via one of the other
+files as a template is the easy mistake.
+
+This is cosmetic — YAML accepts either — so there is nothing to fix here. It is
+recorded because it wasted time once: the file *looks* four-space indented when
+displayed through a tool that prefixes two spaces to every line for readability,
+which is exactly what a command like `sed 's/^/  /'` does. Check with
+`python3 -c "print(repr(open('_data/navigation.yml').read().splitlines()[5]))"`
+before writing a replacement against it.
+
+The related trap: **a `replace` tool that reports zero matches** is usually right
+about the whitespace being different from what was assumed — but the difference
+may be a display artifact rather than real content. Confirm with a hexdump
+(`sed -n '6,9p' _data/navigation.yml | od -c`) rather than re-typing the pattern.
+
+---
+
 ## Checking these claims after a theme upgrade
 
 Two of these depend on the theme's CSS rather than on this repo, so they are

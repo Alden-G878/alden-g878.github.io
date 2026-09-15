@@ -27,10 +27,12 @@ pages, so the views cannot disagree with each other:
 | Projects and research | `_projects/` and `_research/`, one file per entry |
 | The CV, as a page | The same collection files plus `_data/` |
 | The CV, as a PDF | `cv/cv.tex`, a LaTeX master, compiled in CI |
-| Skills and contact details | `_data/` |
+| Skills, education, leadership | `_data/skills.yml`, `_data/education.yml`, `_data/leadership.yml` |
 
 Editing `cv/cv.tex` and pushing regenerates both the PDF and the in-page
-document view, so the CV has a single source of truth.
+document view, so the CV has a single source of truth. The leadership roles are
+the one place where a data file and `cv.tex` are kept in step by hand — see the
+note at the top of `_data/leadership.yml`.
 
 ## Source code
 
@@ -41,5 +43,6 @@ The repository is public:
 
 - [Portfolio]({{ "/portfolio/" | relative_url }}) — every project, filterable
 - [Featured Projects]({{ "/featured/" | relative_url }}) — selected work
+- [Leadership]({{ "/leadership/" | relative_url }}) — teaching and club roles
 - [CV]({{ "/cv/" | relative_url }}) — the complete record
 - [Contact]({{ "/contact/" | relative_url }}) — how to reach me

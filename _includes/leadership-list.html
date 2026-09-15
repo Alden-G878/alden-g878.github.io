@@ -1,0 +1,37 @@
+{% comment %}
+  ===========================================================================
+  Leadership list — renders _data/leadership.yml.
+  ===========================================================================
+  Shared by two callers so the rows cannot drift apart:
+
+    * the interactive pane of /cv/  (_includes/cv-interactive.html)
+    * the /leadership/ page
+
+  Reads the data file directly, so it needs no parameters from the caller.
+
+  Each row goes through the shared timeline-entry.html include, exactly like
+  Education and the Experience timeline. That keeps the markup, the date
+  formatting ("Aug 2026 - present") and the CSS hooks in one place — see the
+  long comment in that file for why `start` and `end` are passed separately
+  rather than as a single pre-formatted string.
+
+  Reverse-chronological order is NOT computed here. _data/leadership.yml is a
+  plain list, so nothing sorts it, and a Liquid `sort` on a nested key is
+  awkward for no benefit on a list this short. The file is hand-ordered instead
+  (ongoing first, then newest start date) — the same convention the Experience
+  timeline uses. Keep it in order when adding a role.
+  ===========================================================================
+{% endcomment %}
+
+<div class="leadership-list">
+  {% for role in site.data.leadership.roles %}
+    {% assign role_title = role.title %}
+    {% if role.course %}{% assign role_title = role.title | append: ", " | append: role.course %}{% endif %}
+    {% include timeline-entry.html
+         title=role_title
+         org=role.org
+         start=role.start
+         end=role.end
+         summary=role.summary %}
+  {% endfor %}
+</div>

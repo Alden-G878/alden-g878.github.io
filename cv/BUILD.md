@@ -203,12 +203,31 @@ On `/cv/`, with all three tabs (*Interactive CV | Document (HTML) | Document (PD
 
 - **Document (HTML)** shows the rendered `cv.tex` with the header, the
   `Placeholder document.` notice, and `Summary` / `Education` / `Skills` /
-  `Experience` / `Research` / `Projects` as `<h2>` headings.
+  `Research Experience` / `Leadership` / `Project Experience` as `<h2>`
+  headings.
+- **Interactive CV** shows the same sections built from `_data/`, including
+  `Leadership`. The two panes are separate build paths (pandoc vs Liquid) that
+  target the same structure — if you add a section to one, add it to the other.
+  Note the heading text differs by design: `cv.tex` uses the master CV's
+  phrasing ("Summary", "Technical Skills", "Experience" timeline), while the
+  interactive pane uses short labels ("Skills"). The order is what must match.
 - **Document (PDF)** renders the PDF inline on desktop; on mobile the browser
   refuses inline PDFs and the fallback message + download link appear instead
   (expected, not a bug).
 - Arrow keys move between tabs and the focus ring follows only the focused one.
 - Skip link, a single sidebar, and `page page--cv` on the article are intact.
+
+The CV is currently **3 pages**, matching the master CV it mirrors, at a matched
+density (0.5in margins, 13.1pt leading vs the master's ~13.2pt). If you edit
+`cv.tex`, re-check the page count before pushing:
+
+```bash
+pdfinfo assets/pdf/Alden_CV.pdf | grep '^Pages'   # expect 3
+```
+
+The margin and `\linespread` notes in `cv.tex` record the measured values and
+why they are set where they are — read those before tightening anything, because
+the layout has been at the edge of overflowing before.
 
 If the PDF embed collapses to a thin line, see the FitVids note in §6.
 

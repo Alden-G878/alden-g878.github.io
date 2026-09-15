@@ -39,22 +39,28 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
-% Margins are measured, not guessed. The master CV uses ~0.5in and runs 3
-% pages; this file tightens to 0.25in, which fits the same content in 2 pages.
-% Rendering it with the default 1in margins needed 5 — a real readability
-% regression, since the master CV is the format recruiters already expect.
+% Margins and leading are measured against the master CV, not guessed. The
+% master uses ~0.5in margins and ~13.2pt leading; matching both here puts the
+% same content in 3 pages at the same density, so this PDF and the master CV
+% read the same.
 %
-% So the PDF is deliberately DENSER than the master CV (2 pages vs 3). That is
-% a knowing trade: the extra page came from the margin, not from dropping
-% content. If a posting asks for a 3-page CV, loosen margin back toward 0.5in
-% rather than re-adding anything.
+% Rendering this content with the default 1in margins needed 5 pages — a real
+% readability regression, since the master CV is the format recruiters already
+% expect.
+%
+% History, so this is not re-tightened by mistake. An earlier revision used
+% margin=0.25in + linespread=0.86: 2 pages, but at a 10.3pt pitch (vs the
+% master's 13.2pt) and with under 2 lines of slack left on either page. That
+% version had no room to grow — adding a single line spilled content onto a
+% near-empty page 3. The values below are the LEAST aggressive that still hold
+% 3 filled pages, so there is headroom again.
 %
 % Note this is deliberately NOT solved by shrinking the font. Dropping to a
 % smaller base size would change every EC font size used, invalidating the
 % fonts baked into the toolchain image (cv/warmup.tex) and costing ~1.5s of
 % mktexpk on the first run after each change. Widening the text block instead
 % keeps the line height and the baked fonts untouched.
-\usepackage[margin=0.25in]{geometry}
+\usepackage[margin=0.5in]{geometry}
 % Times (PSNFSS), matching the master CV. Also narrower than Computer
 % Modern, which recovers roughly a page of length. times.sty is in the
 % PSNFSS bundle already present in texlive-latex-recommended.
@@ -118,11 +124,14 @@
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 
-% Slightly tighter line spacing than the 11pt default (13.6pt). The master CV
-% runs ~13.2pt; 12.8pt keeps it legible while recovering vertical space.
+% Leading matched to the master CV. The 10pt base size has a 12pt default
+% baselineskip, so 1.10 gives 13.2pt — the master CV measures 13.1pt at the
+% same base size, i.e. the two now agree. (This file was 0.86 = 10.3pt, which
+% looked cramped next to the master.)
+%
 % \linespread scales leading only, so no new font sizes are introduced and the
 % toolchain image's baked fonts stay valid (see the geometry note above).
-\linespread{0.86}
+\linespread{1.10}
 
 % --- PDF document metadata (ATS / recruiter tooling) -------------------------
 % Application tracking systems and recruiter tools read the PDF's document
@@ -336,6 +345,38 @@ HackerFab, Carnegie Mellon University \hfill \cvwhen{Sep 2025 - Dec 2025}
 \end{itemize}
 
 % ---- Project Experience ---------------------------------------------------
+% ---- Leadership ------------------------------------------------------------
+% Placed between Research and Project Experience on purpose: leadership is a
+% supporting signal, so it must not interrupt the technical narrative, but it
+% deserves a heading of its own rather than being buried in Technical Skills.
+%
+% Teaching is CMU coursework support (98-341), NOT a TA-ship for a different
+% institution, and the two roles are the same course at different levels of
+% responsibility — teacher now, TA previously. Listed as two dated entries
+% rather than one, so the progression from TA to instructor is visible.
+\cvsection{Leadership}
+
+\textbf{Class Teacher, 98-341: Build Your Own Breadboard Computer} \\
+Carnegie Mellon University \hfill \cvwhen{Aug 2026 - Present}
+\begin{itemize}\tightlist
+  \item Teaching 98-341, covering the design and construction of a
+    breadboard computer.
+\end{itemize}
+
+\entrysep
+\textbf{Teaching Assistant, 98-341: Build Your Own Breadboard Computer} \\
+Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
+\begin{itemize}\tightlist
+  \item Supported students with hardware debugging and design questions in
+    the same course.
+\end{itemize}
+
+\entrysep
+\textbf{Electronics Head, Robotics Club} \hfill \cvwhen{Aug 2025 - Present}
+\begin{itemize}\tightlist
+  \item Lead the electronics subgroup of the club.
+\end{itemize}
+
 \cvsection{Project Experience}
 
 \textbf{Standard Cell Library Design} \hfill \cvwhen{Apr 2026 - Present}

@@ -265,6 +265,17 @@
 
 .cv-classwork { font-size: 0.9rem; }
 
+/* ---- Leadership list ---- */
+/* Wrapper emitted by _includes/leadership-list.html, shared by the /leadership/
+   page and the interactive pane of /cv/. The rows inside are plain
+   .timeline-entry blocks, so they need no styling of their own; this only
+   removes the trailing rule so the list does not end on a stray divider. */
+.leadership-list > .timeline-entry:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0.5rem;
+}
+
 /* ---- Custom footer ---- */
 .site-footer-custom {
   margin-top: 2rem;

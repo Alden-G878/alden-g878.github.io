@@ -5,6 +5,8 @@ main:
     url: /portfolio/
   - title: "Featured Projects"
     url: /featured/
+  - title: "Leadership"
+    url: /leadership/
   - title: "CV"
     url: /cv/
   - title: "About"

@@ -1,0 +1,54 @@
+# Leadership roles — single source of truth for the /leadership/ page and the
+# interactive pane of /cv/.
+#
+# Kept in step with the Leadership section of cv/cv.tex, which is the master CV.
+# The two views of /cv/ (the interactive tab, built from these data files, and
+# the document tab, rendered from cv.tex) must not disagree — the same rule that
+# applies to _data/education.yml and _data/skills.yml. See cv/BUILD.md.
+#
+# This is a plain list, not a Jekyll collection, so nothing sorts it for us.
+# Order below is manual: ongoing first, then reverse-chronological by start
+# date — the same convention the Experience timeline uses elsewhere on the site.
+#
+# Fields:
+#   title    what the role is called
+#   course   the specific course/section, when the role is teaching (optional)
+#   org      institution or organisation
+#   start    date the role began
+#   end      date it ended, or null while ongoing
+#   kind     teaching | club — what sort of leadership this is
+#   summary  one line, rendered under the title
+#
+# `kind` is deliberately not used for grouping on the page (the list stays
+# reverse-chronological, matching every other timeline on the site). It is kept
+# because it records the nature of each role, and the CV's Leadership section
+# distinguishes the same two categories.
+
+roles:
+  - title: "Class Teacher"
+    course: "98-341: Build Your Own Breadboard Computer"
+    org: "Carnegie Mellon University"
+    start: 2026-08-01
+    end: null # null = ongoing
+    kind: teaching
+    summary: >
+      Teaching 98-341, covering the design and construction of a breadboard
+      computer.
+
+  - title: "Teaching Assistant"
+    course: "98-341: Build Your Own Breadboard Computer"
+    org: "Carnegie Mellon University"
+    start: 2026-01-01
+    end: 2026-05-01
+    kind: teaching
+    summary: >
+      Supported students with hardware debugging and design questions in the
+      same course.
+
+  - title: "Electronics Head"
+    org: "Robotics Club"
+    start: 2025-08-01
+    end: null # null = ongoing
+    kind: club
+    summary: >
+      Lead the electronics subgroup of the club.

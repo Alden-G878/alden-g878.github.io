@@ -1,6 +1,6 @@
 {% comment %}
   ===========================================================================
-  Interactive CV body — Education / Skills / Experience.
+  Interactive CV body — Education / Skills / Leadership / Experience.
   ===========================================================================
   Extracted from `_layouts/cv.html` so it can be rendered in two places
   without duplicating markup:
@@ -65,6 +65,23 @@
     {% else %}
       <p class="notice--info">Skills will appear here once parsed from the CV.</p>
     {% endif %}
+  </section>
+{% endif %}
+
+{% comment %}
+  ---- Leadership (from _data/leadership.yml) ----
+  Placed after Skills and before Experience, matching the section order of
+  cv/cv.tex (Summary / Education / Technical Skills / Research Experience /
+  Leadership / Project Experience) so the interactive pane and the document tab
+  of /cv/ read in the same order.
+
+  Rendered through the shared leadership-list.html include, which is also what
+  the /leadership/ page uses — the two cannot drift.
+{% endcomment %}
+{% if site.data.leadership.roles.size > 0 %}
+  <section id="leadership">
+    <h2>Leadership</h2>
+    {% include leadership-list.html %}
   </section>
 {% endif %}
 
