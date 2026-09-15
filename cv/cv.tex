@@ -115,7 +115,7 @@
 % runs ~13.2pt; 12.8pt keeps it legible while recovering vertical space.
 % \linespread scales leading only, so no new font sizes are introduced and the
 % toolchain image's baked fonts stay valid (see the geometry note above).
-\linespread{0.88}
+\linespread{0.87}
 
 % --- PDF document metadata (ATS / recruiter tooling) -------------------------
 % Application tracking systems and recruiter tools read the PDF's document
@@ -141,9 +141,9 @@
 % and pandoc's LaTeX reader still sees ordinary itemize blocks).
 \newcommand{\tightlist}{%
   \setlength{\itemsep}{0pt}%
-  \setlength{\leftmargin}{1.35em}%
+  \setlength{\leftmargin}{1.2em}%
   \setlength{\parskip}{0pt}%
-  \setlength{\topsep}{0pt}%
+  \setlength{\topsep}{2pt}%
   \setlength{\parsep}{0pt}%
 }
 
@@ -186,7 +186,7 @@
 % 3 pages, matching the master CV it mirrors. Do not tighten further without
 % re-checking legibility — the aim is a readable CV, not a short one.
 \newcommand{\cvsection}[1]{%
-  \vspace*{-20pt}%
+  \vspace*{-14pt}%
   \section*{#1}%
   \vspace*{-9pt}%
 }
@@ -247,7 +247,7 @@ between degrees.
 \textbf{Carnegie Mellon University, Pittsburgh, PA} \\
 BS in Electrical and Computer Engineering, expected graduation December 2026 \\
 Expected MS in Electrical and Computer Engineering (combined MS/BS program),
-graduating 2028, with Ph.D. intent
+graduating 2028, with Ph.D. intent \\
 \textbf{Notable Classwork:} 18-447: Introduction to Computer Architecture, 18-320: Microelectronic Circuits, 18-340: Hardware Arithmetic
     for Machine Learning, 18-349: Introduction to Embedded Systems
 

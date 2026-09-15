@@ -4,29 +4,24 @@ layout: archive
 {%- assign locale = page.locale | default: layout.locale | default: site.locale -%}
 
 {% comment %}
-  Flagship projects + research, rendered via the shared project-card include.
-  Sorted by date_end desc; ongoing (null) entries naturally float to the top.
+  Homepage wrapper.
 
-  NOTE: the archive layout (inherited above) already renders the sidebar and
-  page title — do NOT add another <div id="main"> / sidebar here, or they
-  will be duplicated.
+  This layout is intentionally thin: it renders the page body and nothing else.
+
+  Two traps, both hit here before:
+
+  1. `{{ content }}` MUST be emitted. Because layouts chain, the `{{ content }}`
+     inside the theme's archive.html refers to THIS layout's rendered output, not
+     to index.markdown's body. Without the line below the homepage renders empty
+     with no error — see docs/layout-gotchas.md #4.
+
+  2. The archive layout (inherited above) already renders the sidebar and the
+     page title, so do NOT add another <div id="main"> / sidebar here or they
+     will be duplicated — see docs/layout-gotchas.md #1.
+
+  The featured-projects grid used to be hardcoded here. It now lives on
+  /featured/ (all of it) and in index.markdown (a three-card teaser), so this
+  layout no longer knows anything about projects.
 {% endcomment %}
 
-{% assign flagship_projects = site.projects | where: "flagship", true %}
-{% assign flagship_research = site.research | where: "flagship", true %}
-{% assign flagship = flagship_projects | concat: flagship_research
-               | sort: "date_end" | reverse %}
-
-{% if flagship.size > 0 %}
-  <h3 class="archive__subtitle">Featured Projects</h3>
-  <div class="grid grid--entries">
-    {% for entry in flagship %}
-      {% include project-card.html entry=entry %}
-    {% endfor %}
-  </div>
-{% else %}
-  <p class="notice--info">
-    No flagship projects flagged yet — <code>flagship: true</code> in a collection
-    file's front matter to surface it here.
-  </p>
-{% endif %}
+{{ content }}

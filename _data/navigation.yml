@@ -3,6 +3,8 @@ main:
     url: /
   - title: "Portfolio"
     url: /portfolio/
+  - title: "Featured Projects"
+    url: /featured/
   - title: "CV"
     url: /cv/
   - title: "About"
