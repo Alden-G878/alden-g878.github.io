@@ -19,15 +19,36 @@
 # in the templates via {{ site.myvariable }}.
 
 locale: "en-US"
-title: Your awesome title
-email: your-email@example.com
-description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+# `name` and `title` are separate on purpose, and both matter:
+#
+#   name  -> the person. Feeds the JSON-LD "Person" block emitted by MM's
+#            _includes/schema.html, which reads `site.social.name | default:
+#            site.name`. With neither set, that block published
+#            `"name": null` — broken structured data on the homepage.
+#   title -> the site. Used for <title>, og:site_name and the feed.
+#
+# TODO(owner): add the surname, e.g. name: "Alden Grover". The site is public
+# and indexable, and every page title currently reads just "Alden", so a
+# recruiter searching for a full name will not match. Kept short until
+# confirmed rather than guessed.
+name: "Alden"
+title: "Alden — Computer Engineering"
+# TODO(owner): the stock Jekyll placeholder shipped here before. This version is
+# factual and matches _data/education.yml; replace with a real one-liner once the
+# master CV is parsed.
+description: >-
+  Alden — computer engineering student at Carnegie Mellon University. Projects
+  and research in RTL design, verification, computer architecture and embedded
+  systems.
+# Was "your-email@example.com" (a placeholder). Kept unset rather than fake:
+# MM prints this in the footer, and `mailto:` only renders when it is a real
+# address. Fill in to make the site emit machine-readable contact info.
+email:
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://alden-g878.github.io" # the base hostname & protocol for your site
-twitter_username: jekyllrb
+# NOTE: MM uses twitter_username for share links (twitter:site/creator). It is
+# not Alden's handle, so it is left unset rather than claiming a stranger's.
+twitter_username:
 github_username: alden-g878
 
 # Minimal Mistakes theme settings

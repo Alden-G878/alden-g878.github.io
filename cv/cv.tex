@@ -85,6 +85,27 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt}
 
+% --- PDF document metadata (ATS / recruiter tooling) -------------------------
+% Application tracking systems and recruiter tools read the PDF's document
+% information dictionary to answer "whose CV is this?" and "what is it?".
+% Without \hypersetup, pdfTeX leaves Title/Author/Subject/Keywords EMPTY, which
+% is what this file shipped before: `pdfinfo` reported blank fields on every
+% build, so an automated reader had nothing to index by name.
+%
+% \hypersetup also removes hyperref's default "LaTeX with hyperref" authorship
+% signal. Note the pdftex option is required for pdftitle/pdfauthor to take
+% effect in pdfTeX; the values are plain ASCII deliberately, since PDFDocEncoding
+% handles the em dash poorly in metadata strings.
+%
+% TODO(owner): add the surname here too, matching _config.yml's `name`.
+\hypersetup{
+  pdftex,
+  pdftitle  = {Alden - Curriculum Vitae},
+  pdfauthor = {Alden},
+  pdfsubject= {Curriculum Vitae},
+  pdfkeywords={RTL design, verification, computer architecture, embedded systems, computer engineering},
+}
+
 % Compact bullet lists, applied per-list (plain LaTeX: valid inside \itemize,
 % and pandoc's LaTeX reader still sees ordinary itemize blocks).
 \newcommand{\tightlist}{%

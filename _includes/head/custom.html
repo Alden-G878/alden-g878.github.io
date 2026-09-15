@@ -1,0 +1,90 @@
+<!--
+  Custom head snippets. Minimal Mistakes includes this file at the end of
+  <head> (see the theme's _layouts/default.html line 10), so it is the supported
+  place to add head-level markup without forking a theme include.
+
+  Everything below describes the SAME person whose CV is at /cv/, in the format
+  search engines and recruiter tools actually parse. Without it, the site's only
+  structured data was the theme's own Person block (_includes/schema.html),
+  which carries just `name` and `url` — no role, no employer, no school, no way
+  to make contact.
+
+  Two deliberate choices:
+
+  1. Only emit a property when its value is non-null. Publishing
+     `"jobTitle": null` is worse than omitting it: a consumer cannot tell
+     "unknown" from "explicitly nothing". The `_data/links.yml` values are the
+     single source of truth, so filling that file in automatically enriches this
+     block — no edit to this file is needed.
+
+  2. `sameAs` uses `append` on an array so both the GitHub link and (later) a
+     LinkedIn URL are listed. `sameAs` is how a machine ties this page to a
+     real person across the web.
+
+  TODO(owner): `location` / `email` / `linkedin` in _data/links.yml are null, so
+  the corresponding properties below are skipped. Filling them in is the single
+  highest-impact ATS change available.
+-->
+
+{%- comment %}
+  Favicon. The site previously declared none, so every visitor (and every
+  browser-cached preview, e.g. a recruiter's bookmark or a link unfurl) hit a
+  404 at /favicon.ico.
+
+  Ordered smallest-favicon-first per convention, with the SVG preferred by
+  modern browsers and the .ico retained for older ones. Paths go through
+  relative_url so they survive a baseurl change.
+{%- endcomment %}
+<link rel="icon" type="image/svg+xml" href="{{ '/assets/images/favicon.svg' | relative_url }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ '/assets/images/favicon-32.png' | relative_url }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ '/assets/images/favicon-16.png' | relative_url }}">
+<link rel="shortcut icon" href="{{ '/favicon.ico' | relative_url }}">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ '/assets/images/favicon-180.png' | relative_url }}">
+<link rel="mask-icon" href="{{ '/assets/images/favicon.svg' | relative_url }}" color="#7a8288">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ site.author.name | default: site.name | jsonify }},
+  "url": {{ '/' | absolute_url | jsonify }},
+  {%- if site.author.bio %}
+  "description": {{ site.author.bio | strip | jsonify }},
+  {%- endif %}
+  {%- if site.data.education.institution %}
+  "alumniOf": {
+    "@type": "CollegeOrUniversity",
+    "name": {{ site.data.education.institution | jsonify }}
+  },
+  {%- endif %}
+  {%- assign same_as = '' | split: ',' | compact -%}
+  {%- if site.data.links.github %}
+    {%- assign same_as = same_as | push: site.data.links.github -%}
+  {%- endif -%}
+  {%- if site.data.links.linkedin %}
+    {%- assign same_as = same_as | push: site.data.links.linkedin -%}
+  {%- endif -%}
+  {%- if same_as.size > 0 %}
+  "sameAs": {{ same_as | jsonify }},
+  {%- endif %}
+  {%- if site.data.links.email %}
+  "email": {{ site.data.links.email | jsonify }},
+  {%- endif %}
+  {%- if site.data.links.location %}
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": {{ site.data.links.location | jsonify }}
+  },
+  {%- endif %}
+  {%- comment %}
+    `knowsAbout` must be human-readable topic names. _data/categories.yml holds
+    filter slugs ("rtl-design"), because that is what the portfolio's
+    data-category attributes and the collection front matter must match exactly.
+    Publishing the raw slugs here would tell a parser the person knows about
+    "rtl-design", so each is expanded the same way the portfolio chips do it
+    (hyphens -> spaces). It is still a coarse signal: the slugs are a topical
+    vocabulary, not the CV's specific skills, which live in _data/skills.yml.
+  {%- endcomment -%}
+  "knowsAbout": {{ site.data.categories.categories | join: '|' | replace: '-', ' ' | split: '|' | jsonify }}
+}
+</script>
