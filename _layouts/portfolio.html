@@ -62,29 +62,74 @@ layout: archive
   — there is no prose to remember to delete.
 {% endcomment %}
 {% assign total_entries = combined.size %}
+{% assign project_count = site.projects | size %}
+{% assign research_count = site.research | size %}
 
 {% if total_entries > 0 %}
-<div class="portfolio-filters" id="portfolio-filters">
-  {% comment %}
-    Selection is expressed ONLY by `.active`, which the JS below adds and
-    removes. Do not add btn--primary here: it was previously hardcoded, and
-    because the JS never removes it the "All" chip stayed dark and looked
-    permanently selected. The colours live in assets/css/main.scss.
+{% comment %}
+  Two filter rows, and they COMBINE (intersection):
 
-    aria-pressed mirrors the class so a screen reader can announce which
-    filter is applied. It is kept in step with .active by the same JS.
-  {% endcomment %}
-  <button class="btn filter-chip active" data-category="all" aria-pressed="true">
-    All
-  </button>
-  {% for cat in all_categories %}
-    <button class="btn filter-chip" data-category="{{ cat }}" aria-pressed="false">
-      {{ cat | replace: '-', ' ' }}
+    Type      All | Projects | Research      <- from entry.collection
+    Category  All | rtl design | fpga | ...  <- union of entry.categories
+
+  The type filter exists because a category filter cannot distinguish the two
+  collections: they share 5 of their 10 categories (asic-design,
+  computer-architecture, embedded-systems, fpga, pcb-eda). `entry.collection` is
+  the discriminator that is always correct.
+
+  Counts are shown on the type chips so the split is visible without clicking.
+
+  Selection is expressed ONLY by `.active`, which the JS below adds and removes.
+  Do not add btn--primary to a chip here: it was previously hardcoded, and because
+  the JS never removes it the chip stayed dark and looked permanently selected.
+  The colours live in assets/css/main.scss.
+
+  aria-pressed mirrors the class so a screen reader can announce which filters
+  are applied. Both rows are kept in step by the same JS.
+{% endcomment %}
+<div class="portfolio-filters">
+  <div class="portfolio-filters__row" id="portfolio-type-filters"
+       role="group" aria-label="Filter by entry type">
+    <span class="portfolio-filters__label">Type</span>
+    <button class="btn filter-chip active" data-type="all" aria-pressed="true">
+      All
     </button>
-  {% endfor %}
+    <button class="btn filter-chip" data-type="projects" aria-pressed="false">
+      Projects <span class="filter-chip__count">{{ project_count }}</span>
+    </button>
+    <button class="btn filter-chip" data-type="research" aria-pressed="false">
+      Research <span class="filter-chip__count">{{ research_count }}</span>
+    </button>
+  </div>
+
+  <div class="portfolio-filters__row" id="portfolio-category-filters"
+       role="group" aria-label="Filter by category">
+    <span class="portfolio-filters__label">Category</span>
+    <button class="btn filter-chip active" data-category="all" aria-pressed="true">
+      All
+    </button>
+    {% for cat in all_categories %}
+      <button class="btn filter-chip" data-category="{{ cat }}" aria-pressed="false">
+        {{ cat | replace: '-', ' ' }}
+      </button>
+    {% endfor %}
+  </div>
 </div>
 
-<div class="grid grid--entries portfolio-grid" id="portfolio-grid">
+{% comment %}
+  `portfolio-grid` is the real hook (styles in assets/css/main.scss).
+  The former `grid grid--entries` classes are gone: they exist nowhere in the
+  compiled stylesheet, so they did nothing but imply a two-column layout that
+  was never applied — measured at 853px full width, one per row.
+{% endcomment %}
+{% comment %}
+  Live count of matching entries. Written by the filter JS; without it a
+  combination matching nothing looks broken rather than empty. aria-live so
+  a screen reader hears the change when a filter is applied.
+{% endcomment %}
+<p class="portfolio-count" id="portfolio-count" aria-live="polite"></p>
+
+<div class="portfolio-grid" id="portfolio-grid">
   {% for entry in flagship %}
     {% include project-card.html entry=entry %}
   {% endfor %}
@@ -109,33 +154,80 @@ layout: archive
 {% endif %}
 
 <script>
-  // Client-side filtering: toggle .hidden by data-category; no backend needed.
+  // Client-side filtering. Two independent rows (type and category) combine as
+  // an intersection, so "Research" + "FPGA" shows only research entries tagged
+  // fpga. No backend: cards are toggled with `display`.
   (function () {
-    // The empty-state branch above renders no grid at all, in which case there
-    // is nothing to filter and the chips are absent too.
+    // The empty-state branch above renders no grid, in which case there are no
+    // chips either.
     var container = document.getElementById('portfolio-grid');
     if (!container) return;
-    var cards = container.querySelectorAll('.project-card[data-categories]');
-    var chips = document.querySelectorAll('#portfolio-filters .filter-chip');
 
-    function applyFilter(category) {
-      cards.forEach(function (card) {
-        var cats = (card.getAttribute('data-categories') || '').split(/\s+/);
-        var show = category === 'all' || cats.indexOf(category) !== -1;
-        card.style.display = show ? '' : 'none';
-      });
-      chips.forEach(function (c) {
-        var selected = c.getAttribute('data-category') === category;
-        c.classList.toggle('active', selected);
+    var cards = Array.prototype.slice.call(
+      container.querySelectorAll('.project-card[data-categories]'));
+    var typeChips = Array.prototype.slice.call(
+      document.querySelectorAll('#portfolio-type-filters .filter-chip'));
+    var catChips = Array.prototype.slice.call(
+      document.querySelectorAll('#portfolio-category-filters .filter-chip'));
+
+    // Current selection for each row. 'all' means "do not restrict".
+    var state = { type: 'all', category: 'all' };
+
+    function setActive(chips, attr, value) {
+      chips.forEach(function (chip) {
+        var selected = chip.getAttribute(attr) === value;
+        chip.classList.toggle('active', selected);
         // Keep the accessible state in step with the visual one.
-        c.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        chip.setAttribute('aria-pressed', selected ? 'true' : 'false');
       });
     }
 
-    chips.forEach(function (chip) {
+    function apply() {
+      cards.forEach(function (card) {
+        var typeOk = state.type === 'all' ||
+          card.getAttribute('data-type') === state.type;
+        var cats = (card.getAttribute('data-categories') || '').split(/\s+/);
+        var catOk = state.category === 'all' ||
+          cats.indexOf(state.category) !== -1;
+        // `block` rather than '' — an empty string falls back to the stylesheet,
+        // which is `display: block` for a div, but being explicit avoids any
+        // dependence on the stylesheet's default.
+        card.style.display = (typeOk && catOk) ? 'block' : 'none';
+      });
+      setActive(typeChips, 'data-type', state.type);
+      setActive(catChips, 'data-category', state.category);
+      updateCount(container.querySelectorAll('.project-card[data-categories]'));
+    }
+
+    // Announce how many entries the current combination matches, so a filter
+    // that matches nothing is obvious rather than looking like a broken page.
+    function updateCount(all) {
+      var shown = 0;
+      Array.prototype.forEach.call(all, function (c) {
+        if (c.style.display !== 'none') shown += 1;
+      });
+      var out = document.getElementById('portfolio-count');
+      if (out) {
+        out.textContent = shown === 1
+          ? '1 entry'
+          : shown + ' entries';
+      }
+    }
+
+    typeChips.forEach(function (chip) {
       chip.addEventListener('click', function () {
-        applyFilter(chip.getAttribute('data-category'));
+        state.type = chip.getAttribute('data-type');
+        apply();
       });
     });
+    catChips.forEach(function (chip) {
+      chip.addEventListener('click', function () {
+        state.category = chip.getAttribute('data-category');
+        apply();
+      });
+    });
+
+    // Initialise, so the counts are correct before the first click.
+    apply();
   })();
 </script>

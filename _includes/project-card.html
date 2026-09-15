@@ -1,12 +1,36 @@
 {% comment %}
-  One portfolio/home card. Expects `entry` (a collection document) passed in.
-  Renders flagship badge, summary, tech chips, and links to the detail page.
+  One portfolio/home/featured card. Expects `entry` (a collection document).
+
+  Renders the type badge, flagship badge, status badge, summary, lab/group,
+  publication status, tech chips, dates, and a repo link when one exists.
+
+  `data-type` is taken from `entry.collection`, which renders the collection's
+  label ("projects" or "research") and compares correctly in Liquid. That is the
+  only sound discriminator between the two collections: they share 5 of their 10
+  categories, so categories cannot separate them. The filter JS reads this
+  attribute.
+
+  Do not add `grid`/`grid--entries` classes to this card. They were previously on
+  the container and exist nowhere in the stylesheet — a decorative class named
+  "grid" that produced a single full-width column, which is misleading to read.
 {% endcomment %}
-<div class="project-card" data-categories="{{ entry.categories | join: ' ' }}">
+{% assign card_type = entry.collection %}
+<div class="project-card project-card--{{ card_type }}"
+     data-categories="{{ entry.categories | join: ' ' }}"
+     data-type="{{ card_type }}">
   <div class="project-card__header">
     <h3 class="project-card__title">
       <a href="{{ entry.url | relative_url }}">{{ entry.title }}</a>
     </h3>
+    {% comment %}
+      Type badge first: it answers "what kind of entry is this?" before the
+      reader parses the title.
+    {% endcomment %}
+    {% if card_type == 'research' %}
+      <span class="badge badge--research">Research</span>
+    {% else %}
+      <span class="badge badge--project">Project</span>
+    {% endif %}
     {% if entry.flagship %}
       <span class="badge badge--star">★ Featured</span>
     {% endif %}
@@ -17,6 +41,15 @@
 
   {% if entry.summary %}
     <p class="project-card__summary">{{ entry.summary }}</p>
+  {% endif %}
+
+  {% comment %}
+    Lab/group and publication status are research-only fields. They were
+    previously never rendered, which is why a research entry looked identical to
+    a personal project.
+  {% endcomment %}
+  {% if entry.group %}
+    <p class="project-card__group">{{ entry.group }}{% if entry.pi %} &middot; PI: {{ entry.pi }}{% endif %}</p>
   {% endif %}
 
   {% if entry.tech_stack and entry.tech_stack.size > 0 %}
@@ -33,6 +66,13 @@
       {% if entry.date_end %}{{ entry.date_end | date: "%b %Y" }}{% else %}present{% endif %}
     {% endif %}
     {% if entry.role %} &middot; {{ entry.role }}{% endif %}
+    {% comment %}
+      publication_status is research-only. "In preparation" is a meaningful
+      signal, so it belongs in the meta line rather than being dropped.
+    {% endcomment %}
+    {% if entry.publication_status and entry.publication_status != 'none' %}
+      &middot; <span class="project-card__pubstatus">{{ entry.publication_status | replace: '-', ' ' }}</span>
+    {% endif %}
   </p>
 
   {% if entry.repo_url %}

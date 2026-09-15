@@ -65,7 +65,7 @@ open to industry roles between degrees.
 
 ### Selected work
 
-<div class="grid grid--entries home-teaser">
+<div class="home-teaser">
   {% for entry in featured limit: 3 %}
     {% include project-card.html entry=entry %}
   {% endfor %}

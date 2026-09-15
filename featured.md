@@ -37,7 +37,7 @@ see the [Portfolio]({{ "/portfolio/" | relative_url }}).
 {% assign featured = ongoing | concat: dated %}
 
 {% if featured.size > 0 %}
-  <div class="grid grid--entries featured-grid">
+  <div class="featured-grid">
     {% for entry in featured %}
       {% include project-card.html entry=entry %}
     {% endfor %}

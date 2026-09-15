@@ -20,6 +20,30 @@
   background: #fff;
 }
 
+/*
+  Research entries get a coloured left edge in addition to the badge.
+
+  Rationale: a badge labels one card, but a border makes the two kinds
+  distinguishable while scanning a whole column — which is the actual reading
+  task on the portfolio. Colour matches .badge--research.
+*/
+.project-card--research {
+  border-left: 3px solid #3b9cba;
+}
+
+// Lab/group line. Research-only, and previously never rendered at all.
+.project-card__group {
+  font-size: 0.85rem;
+  color: #555;
+  margin: 0.35rem 0 0;
+}
+
+// Publication status inside the meta line, e.g. "in preparation".
+.project-card__pubstatus {
+  color: #3b9cba;
+  font-weight: 600;
+}
+
 .project-card__header {
   display: flex;
   align-items: center;
@@ -93,9 +117,51 @@
 .badge--success { background: #2ecc71; color: #fff; }
 .badge--star    { background: #f39c12; color: #fff; }
 
+/*
+  Entry-type badges. Research and Project previously rendered identically, even
+  though research entries carry a PI, a lab and a publication status that
+  projects never have. Research uses the skin's $info-color to tie it to the
+  "In preparation" info badge on the detail page; Project is neutral.
+*/
+.badge--research { background: #3b9cba; color: #fff; }
+.badge--project  { background: #b9c0c5; color: #333; }
+
 /* ---- Portfolio filter bar ---- */
 .portfolio-filters {
   margin: 1rem 0 1.5rem;
+}
+
+/*
+  Two rows, each with a small leading label. The label matters: without it the
+  two "All" chips are indistinguishable and it reads as a duplicated control.
+*/
+.portfolio-filters__row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.portfolio-filters__label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #777;
+  min-width: 4.5rem;
+}
+
+/* Count of matching entries, written by the filter JS. */
+.portfolio-count {
+  font-size: 0.85rem;
+  color: #777;
+  margin: 0 0 0.75rem;
+}
+
+/* Small count shown inside the type chips, so the split is visible up front. */
+.filter-chip__count {
+  opacity: 0.75;
+  font-size: 0.9em;
 }
 
 .filter-chip {
@@ -145,6 +211,30 @@
 .filter-chip:not(.active):hover,
 .filter-chip:not(.active):focus {
   background-color: #d8d8d8;
+}
+
+/*
+  Card list wrappers.
+
+  These replace the former `grid grid--entries` classes, which existed nowhere in
+  the stylesheet: a pair of names that implied a two-column layout while the
+  cards rendered full-width, one per row (measured at 853px).
+
+  There is no grid here on purpose. `display: grid` with `auto-fit` was
+  considered and rejected: the cards are text-dense, and side-by-side columns
+  would halve their width and make the summaries and tech chips wrap badly. A
+  single readable column is the right call for this content, so the wrapper only
+  exists to control spacing.
+*/
+.home-teaser,
+.featured-grid {
+  margin-top: 0.5rem;
+}
+
+/* Link that leads from the homepage teaser to the full featured list. */
+.home-teaser__more {
+  margin: 0.25rem 0 1rem;
+  font-weight: 600;
 }
 
 /* ---- CV timeline ---- */
