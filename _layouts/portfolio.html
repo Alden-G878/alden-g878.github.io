@@ -65,11 +65,20 @@ layout: archive
 
 {% if total_entries > 0 %}
 <div class="portfolio-filters" id="portfolio-filters">
-  <button class="btn btn--primary filter-chip active" data-category="all">
+  {% comment %}
+    Selection is expressed ONLY by `.active`, which the JS below adds and
+    removes. Do not add btn--primary here: it was previously hardcoded, and
+    because the JS never removes it the "All" chip stayed dark and looked
+    permanently selected. The colours live in assets/css/main.scss.
+
+    aria-pressed mirrors the class so a screen reader can announce which
+    filter is applied. It is kept in step with .active by the same JS.
+  {% endcomment %}
+  <button class="btn filter-chip active" data-category="all" aria-pressed="true">
     All
   </button>
   {% for cat in all_categories %}
-    <button class="btn filter-chip" data-category="{{ cat }}">
+    <button class="btn filter-chip" data-category="{{ cat }}" aria-pressed="false">
       {{ cat | replace: '-', ' ' }}
     </button>
   {% endfor %}
@@ -102,6 +111,8 @@ layout: archive
 <script>
   // Client-side filtering: toggle .hidden by data-category; no backend needed.
   (function () {
+    // The empty-state branch above renders no grid at all, in which case there
+    // is nothing to filter and the chips are absent too.
     var container = document.getElementById('portfolio-grid');
     if (!container) return;
     var cards = container.querySelectorAll('.project-card[data-categories]');
@@ -114,7 +125,10 @@ layout: archive
         card.style.display = show ? '' : 'none';
       });
       chips.forEach(function (c) {
-        c.classList.toggle('active', c.getAttribute('data-category') === category);
+        var selected = c.getAttribute('data-category') === category;
+        c.classList.toggle('active', selected);
+        // Keep the accessible state in step with the visual one.
+        c.setAttribute('aria-pressed', selected ? 'true' : 'false');
       });
     }
 

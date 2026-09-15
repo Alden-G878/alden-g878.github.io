@@ -103,6 +103,50 @@
   margin-bottom: 0.4rem;
 }
 
+/*
+  Selection styling for the category filters.
+
+  The JS toggles an `.active` class on the clicked chip (and removes it from the
+  others), but no CSS ever consumed that class, so selecting a category changed
+  nothing visually: every chip stayed the same grey. Measured before the fix —
+  the clicked chip and the unselected ones both computed to
+  background rgb(239,239,239), and distinct background colours were identical
+  before and after a click.
+
+  Two things were wrong, and only fixing both makes it work:
+
+  1. There was no `.active` rule at all — this block.
+  2. `btn--primary` was baked onto the "All" chip in the markup, but the filter
+     JS only toggles `.active` and never removes `btn--primary`, so "All" stayed
+     dark and looked permanently selected. That class is gone from the markup;
+     the dark state now comes from `.active` alone, which the JS fully controls.
+
+  Styling `.active` rather than `:hover`/`:focus` is deliberate: hover is a
+  transient pointer state, and the whole point here is to show which filter is
+  *currently applied*. The colours mirror MM's `.btn--primary` (the skin's
+  $primary-color on white) so the selected chip matches the theme's own buttons.
+*/
+.filter-chip.active {
+  background-color: #6f777d;
+  color: #fff;
+}
+
+// Explicitly restate the inactive colours so the two states are symmetric and a
+// theme change cannot leave one of them unstyled. MM's .btn default is
+// #efefef on black; these are set here rather than inherited so the pair is
+// readable in one place.
+.filter-chip:not(.active) {
+  background-color: #efefef;
+  color: #000;
+}
+
+// Hover only applies to chips that are NOT already selected, so hovering the
+// active chip cannot make it look unselected.
+.filter-chip:not(.active):hover,
+.filter-chip:not(.active):focus {
+  background-color: #d8d8d8;
+}
+
 /* ---- CV timeline ---- */
 .timeline-entry {
   margin-bottom: 1.25rem;
