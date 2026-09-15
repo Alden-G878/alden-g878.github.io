@@ -18,13 +18,14 @@ local builds.
 
 .github/workflows/deploy.yml runs ./cv/build.sh on every push to main, so the
 deployed copies are always regenerated from cv/cv.tex and cannot go stale. CI
-also fails the build if _includes/cv-live.html differs from cv.tex (i.e. the
-.tex was edited without re-running the build).
+also fails the build if either artifact differs from cv.tex (i.e. the .tex was
+edited without re-running the build).
 
-Note that the PDF is NOT byte-reproducible (LaTeX embeds a timestamp), so don't
-expect identical bytes between builds — and for that reason CI never byte-diffs
-this file. The HTML file IS deterministic, which is what makes the drift check
-above possible.
+Both artifacts are byte-reproducible, so identical input gives identical bytes.
+pdfTeX would otherwise stamp the current time into the PDF's CreationDate on
+every run; cv/build.sh pins SOURCE_DATE_EPOCH to stop that. That is what lets CI
+byte-compare this file, and it means a modified PDF in `git status` is a real
+change rather than build noise.
 
 Referenced by _data/links.yml -> resume_pdf. If this file is absent, the CV page
 (/cv/) automatically hides both document tabs and the download links, so a

@@ -322,13 +322,32 @@ run_html() {
 run_pdf() {
   step "pdflatex: $PDF_OUT"
 
+  # Reproducible output. pdfTeX stamps the current time into the PDF's
+  # CreationDate/ModDate, so without this the file gets a new hash on every run
+  # even when cv.tex is untouched. That churn is actively harmful: it left an
+  # uncommitted diff after every build, which makes a real content change
+  # impossible to spot in `git status`, and it defeats any byte comparison of
+  # the artifact.
+  #
+  # SOURCE_DATE_EPOCH is the reproducible-builds standard for this, and pdfTeX
+  # honours it natively (verified: two runs at the same epoch gave an identical
+  # sha256, while two runs without it differed). The value is a fixed timestamp,
+  # chosen once and never updated, so the PDF only changes when its CONTENT
+  # changes. Metadata, page count and the text layer are unaffected.
+  #
+  # Note this is deliberately NOT a "skip the build if nothing changed" cache.
+  # Reproducibility is simpler and safer: the build always runs, so it can never
+  # serve a stale artifact, and the drift check can still compare bytes.
+  local sde=1700000000 # 2023-11-14T22:13:20Z
+
   if [[ "$USE_HOST" == true ]]; then
     # Compile out-of-tree so no .aux/.log lands in cv/ — `cv/` is excluded from
     # Jekyll, not from git, so stray intermediates would get committed.
     local tmp
     tmp="$(mktemp -d)"
     cp cv/cv.tex "$tmp/"
-    if ! ( cd "$tmp" && pdflatex -interaction=nonstopmode -halt-on-error cv.tex >/dev/null ); then
+    if ! ( cd "$tmp" && SOURCE_DATE_EPOCH="$sde" \
+             pdflatex -interaction=nonstopmode -halt-on-error cv.tex >/dev/null ); then
       rm -rf "$tmp"
       die "pdflatex failed"
     fi
@@ -340,8 +359,11 @@ run_pdf() {
     # No -e HOME here, deliberately: the image's baked fonts live under root's
     # HOME (/root/.texlive2023/...). Overriding HOME makes TeX look elsewhere and
     # regenerate every font via mktexpk, turning a 0.44 s step into ~2 s.
+    #
+    # SOURCE_DATE_EPOCH makes the output reproducible — see the note above.
     docker run --rm -v "$PWD":/work -w /work \
-      -e HUID="$(id -u)" -e HGID="$(id -g)" "$IMAGE_TAG" bash -c '
+      -e HUID="$(id -u)" -e HGID="$(id -g)" -e SOURCE_DATE_EPOCH="$sde" \
+      "$IMAGE_TAG" bash -c '
         set -e
         cd /tmp && cp /work/cv/cv.tex .
         pdflatex -interaction=nonstopmode -halt-on-error cv.tex >/dev/null

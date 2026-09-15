@@ -225,24 +225,55 @@ The workflow runs four gates after the artifact rebuild. Three come from
 |---|---|---|
 | `cv-live.html` contains `<h2` | `build.sh` | a pandoc parse failure that still exits 0 and would ship a blank tab |
 | PDF text layer has no `prole le` | `build.sh` | broken ligatures (§5) |
-| `cv-live.html` matches `cv/cv.tex` | workflow | *"edited `cv.tex`, forgot to re-run the build"* |
+| `cv-live.html` **and** `Alden_CV.pdf` match `cv/cv.tex` | workflow | *"edited `cv.tex`, forgot to re-run the build"* |
 | `_site/cv/index.html` exists, no `*.tex`/`BUILD.md` in `_site`, `cv-doc` present | workflow | a broken CV page, or LaTeX sources leaking to the web root |
 
-The drift check is only possible because the output is reproducible — measured
-during Phase 2, because it decides what CI may assert:
+### Both artifacts are byte-reproducible
 
-| Artifact | Re-running the build | Can CI diff it? |
-|---|---|---|
-| `_includes/cv-live.html` | Byte-identical (verified twice: same sha256) | ✅ Yes — a drift check is reliable |
-| `assets/pdf/Alden_CV.pdf` | **Different bytes every run** (LaTeX embeds a timestamp) | ❌ No — a byte diff would fail forever |
+The drift check compares committed bytes, which is only meaningful if the build
+is deterministic. Both artifacts are, for different reasons:
 
-The PDF is therefore validated by *content* instead: it parses, it is not tiny,
-and its text layer is clean. Never add a byte comparison for it.
+| Artifact | Why it is reproducible |
+|---|---|
+| `_includes/cv-live.html` | Pandoc output is deterministic for a fixed version and input. |
+| `assets/pdf/Alden_CV.pdf` | pdfTeX would otherwise stamp the **current time** into `CreationDate`/`ModDate` on every run. `cv/build.sh` pins `SOURCE_DATE_EPOCH` (the reproducible-builds standard), so identical input gives identical bytes. |
+
+> **`SOURCE_DATE_EPOCH` is what makes checking the PDF possible at all.** Before
+> it was set, the PDF had a new hash on every run even with no edits, so a byte
+> comparison would have been permanently red and the PDF was excluded from the
+> drift check — the honest conclusion at the time. The fix is preferable to
+> skipping the build when nothing changed: the build always runs, so it can
+> never serve something stale, and the artifact only changes when its content
+> does.
+
+**Why this matters day to day:** without it, every `./cv/build.sh` left an
+uncommitted diff in `assets/pdf/Alden_CV.pdf`. That made `git status` misleading
+— a real content change was indistinguishable from build noise. Now a dirty PDF
+means it genuinely needs committing.
 
 The drift check uses `git status --porcelain`, not `git diff`: `git diff`
 compares the index against the worktree and is blind to untracked files, so a
-regenerated-but-never-`git add`ed `cv-live.html` would pass silently. Porcelain
+regenerated-but-never-`git add`ed artifact would pass silently. Porcelain
 reports `??`/` M`/` D`, covering all three failure modes.
+
+### Checking whether the deployed PDF is current
+
+Comparing hashes is not useful for the *live* site: GitHub serves the PDF with
+`cache-control: max-age=600`, so a browser may hold a copy for ten minutes, and
+the served bytes will not match your local ones for that reason alone. Compare
+the extracted **text** instead, which is what actually matters and ignores any
+remaining incidental differences:
+
+```bash
+curl -s https://alden-g878.github.io/assets/pdf/Alden_CV.pdf -o /tmp/live.pdf
+diff <(pdftotext /tmp/live.pdf -) <(pdftotext assets/pdf/Alden_CV.pdf -)   # empty = current
+```
+
+To bypass the 10-minute cache when you need to see a fresh deploy immediately:
+
+```bash
+curl -s "https://alden-g878.github.io/assets/pdf/Alden_CV.pdf?$(date +%s)" -o /tmp/live.pdf
+```
 
 ## 4. Deploy the site
 
@@ -445,6 +476,17 @@ preserve) becomes `<span class="sans-serif">`, styled by `.cv-doc .sans-serif` i
 Both `--user "$(id -u):$(id -g)"` (pandoc) and `chown "$HUID:$HGID"` (TeX) in
 `build.sh` exist for this. Miss either and the generated file is root-owned, the
 next build fails with *Permission denied*, and it reads like a script bug.
+
+### Do not remove `SOURCE_DATE_EPOCH` from the PDF step
+
+It looks like a stray magic number with no purpose. It is what makes the PDF
+byte-reproducible, and therefore what lets CI byte-compare the committed PDF at
+all. Remove it and the artifact gets a new hash on every build, the drift check
+turns permanently red, and `git status` fills with a PDF diff that is not a real
+change. See §3.
+
+The `pdftex` option in `\hypersetup` (in `cv.tex`) is a similar trap: without it,
+`pdftitle`/`pdfauthor` are silently ignored and the metadata is blank again.
 
 ### The font warm-up fails silently if `warmup.tex` drifts from `cv.tex`
 

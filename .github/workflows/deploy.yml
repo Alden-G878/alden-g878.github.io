@@ -125,45 +125,45 @@ jobs:
           chmod +x cv/build.sh
           ./cv/build.sh
 
-      # The committed copy of cv-live.html must match what cv/cv.tex produces.
-      # This is checkable because the pandoc output is byte-deterministic, while
-      # the PDF is not (see cv/BUILD.md §3).
+      # Both committed artifacts must match what cv/cv.tex produces. This is
+      # checkable because BOTH are now byte-reproducible:
+      #
+      #   _includes/cv-live.html    pandoc output is deterministic by nature.
+      #   assets/pdf/Alden_CV.pdf   pdflatex would otherwise stamp the current
+      #                             time into CreationDate/ModDate on every run,
+      #                             but cv/build.sh pins SOURCE_DATE_EPOCH, so
+      #                             identical input gives identical bytes. That
+      #                             is what makes checking the PDF possible at
+      #                             all — before, a byte comparison would have
+      #                             been permanently red and the PDF was
+      #                             therefore excluded from this check.
       #
       # `git status --porcelain` rather than `git diff --quiet`: diff compares
       # the index against the worktree and is blind to untracked files, so it
-      # would pass for a cv-live.html that was regenerated but never `git add`ed.
+      # would pass for an artifact that was regenerated but never `git add`ed.
       # Porcelain reports "??" for untracked, " M" for modified and " D" for
       # deleted, covering all three failure modes with one condition.
-      #
-      # The PDF is deliberately NOT checked: pdflatex embeds a creation
-      # timestamp, so its bytes differ on every run and any such check would be
-      # permanently red. A binary diff would also tell us nothing useful about
-      # *what* changed.
       - name: Check for CV drift
         run: |
-          status="$(git status --porcelain -- _includes/cv-live.html)"
+          status="$(git status --porcelain -- _includes/cv-live.html assets/pdf/Alden_CV.pdf)"
           if [ -n "$status" ]; then
-            echo "::error::_includes/cv-live.html is out of date with cv/cv.tex."
+            echo "::error::The committed CV artifacts are out of date with cv/cv.tex."
             {
               echo
-              echo "cv/build.sh regenerated the HTML view and it does not match the"
-              echo "committed copy, which means cv/cv.tex was edited without re-running"
-              echo "the build (or the regenerated file was never committed)."
+              echo "cv/build.sh regenerated the artifacts and at least one does not"
+              echo "match the committed copy, which means cv/cv.tex was edited without"
+              echo "re-running the build (or the result was never committed)."
               echo
-              echo "git status says: $status"
+              echo "git status says:"
+              echo "$status"
               echo
-              # Nothing to show for an untracked file, so fall back to a hint
-              # rather than printing an empty diff and looking like a false alarm.
-              if [ "${status%% *}" != "??" ]; then
-                git --no-pager diff --stat -- _includes/cv-live.html
-                echo
-              fi
-              echo "Fix locally with:  ./cv/build.sh --html-only"
-              echo "Then commit cv/cv.tex and _includes/cv-live.html together."
+              echo "Fix locally with:  ./cv/build.sh"
+              echo "Then commit cv/cv.tex together with _includes/cv-live.html and"
+              echo "assets/pdf/Alden_CV.pdf."
             } >&2
             exit 1
           fi
-          echo "ok: _includes/cv-live.html matches cv/cv.tex"
+          echo "ok: _includes/cv-live.html and assets/pdf/Alden_CV.pdf match cv/cv.tex"
 
       # Renders with the lockfile toolchain — Jekyll 4.4.1 / kramdown 2.5.1 /
       # rouge 4.5.1, which is NOT what native Pages used (3.10.0 / 2.4.0 /
