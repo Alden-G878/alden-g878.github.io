@@ -25,15 +25,18 @@ layout: default
 
   <article class="page page--cv" itemscope itemtype="https://schema.org/Person">
   <header>
-    <h1 class="page__title">Alden — Curriculum Vitae</h1>
+    <h1 class="page__title">Alden Grover — Curriculum Vitae</h1>
     {% comment %}
-      Contact line pulled from _data/links.yml (email/github/linkedin rendered
-      by the includes; location only if present).
+      Contact line pulled from _data/links.yml. Location and phone render as
+      PLAIN TEXT, not links, to match the PDF header, so a parser looking for
+      a place or a phone number finds literal text rather than a hyperlink.
     {% endcomment %}
     <p class="cv-contact">
-      {% if site.data.links.email %}<a href="mailto:{{ site.data.links.email }}">{{ site.data.links.email }}</a> &middot;{% endif %}
-      {% if site.data.links.github %}<a href="{{ site.data.links.github }}">{{ site.data.links.github | remove: 'https://' }}</a> &middot;{% endif %}
-      {% if site.data.links.linkedin %}<a href="{{ site.data.links.linkedin }}">LinkedIn</a> &middot;{% endif %}
+      {% if site.data.links.location %}{{ site.data.links.location }} &middot; {% endif %}
+      {% if site.data.links.email %}<a href="mailto:{{ site.data.links.email }}">{{ site.data.links.email }}</a> &middot; {% endif %}
+      {% if site.data.links.phone %}{{ site.data.links.phone }} &middot; {% endif %}
+      {% if site.data.links.github %}<a href="{{ site.data.links.github }}">{{ site.data.links.github | remove: 'https://' }}</a> &middot; {% endif %}
+      {% if site.data.links.linkedin %}<a href="{{ site.data.links.linkedin }}">LinkedIn</a> &middot; {% endif %}
       {% if cv_pdf_exists %}
         <a href="{{ cv_pdf | relative_url }}">Download PDF</a>
       {% endif %}
@@ -114,7 +117,7 @@ layout: default
                 aria-label="CV document, PDF viewer">
           <p class="cv-embed__fallback">
             Inline PDF viewing isn't supported on this device.
-            <a href="{{ cv_pdf | relative_url }}">Download the CV as a PDF</a>
+          <a href="{{ cv_pdf | relative_url }}">Download the CV as a PDF</a>
             instead.
           </p>
         </object>

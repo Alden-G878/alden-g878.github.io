@@ -5,43 +5,144 @@
   this file on every deploy and fails if it drifts from cv.tex.
 -->
 <div class="center">
-<p><span><strong>Alden</strong></span><br />
-<em>[YOUR EMAIL]</em> • <em>[PHONE]</em> • <em>[CITY, STATE]</em><br />
-<a href="https://github.com/alden-g878">github.com/alden-g878</a> • <em>[LINKEDIN URL]</em></p>
+<p><span><strong>Alden Grover</strong></span><br />
+Pittsburgh, PA • aldengrover@gmail.com • 646-539-8055<br />
+<a href="https://alden-g878.github.io">alden-g878.github.io</a> • <a href="https://github.com/alden-g878">github.com/alden-g878</a></p>
 </div>
-<p><strong>Placeholder document.</strong> This PDF was generated from the stub LaTeX file <code>cv/cv.tex</code>. It exists so that the in-page document viewer on <a href="https://alden-g878.github.io/cv/">/cv/</a> has a real file to render. The interactive CV on that page is the authoritative view; this document will be regenerated from the master CV once it is available.</p>
 <h2 class="unnumbered">Summary</h2>
-<p><em>[TWO OR THREE LINES OF SUMMARY — pulled from the master CV, not invented here]</em></p>
+<p>Seeking spring/summer 2027 internships in digital circuit and RTL design and research. BS/MS combined student with Ph.D. intent, open to industry roles between degrees.</p>
 <h2 class="unnumbered">Education</h2>
-<p><strong><em>[INSTITUTION]</em></strong> <span class="sans-serif"><em>[EXPECTED GRADUATION]</em></span><br />
-<em>[DEGREE]</em>, <em>[MAJOR / CONCENTRATION]</em><br />
-</p>
+<p><strong>Carnegie Mellon University, Pittsburgh, PA</strong><br />
+BS in Electrical and Computer Engineering, expected graduation December 2026<br />
+Expected MS in Electrical and Computer Engineering (combined MS/BS program), graduating 2028, with Ph.D. intent</p>
 <ul>
-<li><p><em>[NOTABLE COURSEWORK — or delete this list entirely]</em></p></li>
+<li><p><strong>Notable Classwork:</strong> 18-447: Introduction to Computer Architecture, 18-320: Microelectronic Circuits, 18-340: Hardware Arithmetic for Machine Learning, 18-349: Introduction to Embedded Systems</p></li>
 </ul>
-<h2 class="unnumbered">Skills</h2>
+<h2 class="unnumbered">Technical Skills</h2>
 <ul>
-<li><p><strong>Languages:</strong> <em>[LANGUAGE LIST]</em></p></li>
-<li><p><strong>Frameworks / Tools:</strong> <em>[TOOL LIST]</em></p></li>
-<li><p><strong>Other:</strong> <em>[ANYTHING ELSE]</em></p></li>
+<li><p><strong>RTL Design:</strong> SystemVerilog, Verilog, ASIC RTL design and tape out, FPGA design, TinyTapeout, networks on a chip, USB 2.0 hardware, finite state machines for datapath control, VGA waveform generation</p></li>
+<li><p><strong>RTL Verification and Simulation:</strong> SystemVerilog testbenches, Cocotb, RTL waveform debug, formal reachability proofs for FSMs, Static Timing Analysis, Constrained Random Testing</p></li>
+<li><p><strong>EDA:</strong> Cadence Virtuoso, TSMC 28nm planar PDK, Sky130 PDK, Generic 45nm planar PDK, KiCad</p></li>
+<li><p><strong>Computer Architecture:</strong> RV32I/M ISA and microcode, pipelining, branch prediction, cache management and bus snooping</p></li>
+<li><p><strong>Embedded Systems:</strong> Embedded C++, RTOS development, bootloader design, custom serial protocols, hard real-time systems, memory-mapped peripheral firmware development</p></li>
+<li><p><strong>Hardware Acceleration:</strong> Systolic arrays, neural-network inference, KNN acceleration, decision-tree acceleration, floating-point arithmetic</p></li>
+<li><p><strong>Languages:</strong> C, C++, SystemVerilog, Python, Julia</p></li>
+<li><p><strong>Tools:</strong> Git and GitHub, PCB design, CAD, CAM</p></li>
 </ul>
-<h2 class="unnumbered">Experience</h2>
-<p><strong><em>[ROLE]</em></strong> <span class="sans-serif"><em>[START – END OR ONGOING]</em></span><br />
-<em>[ORGANISATION]</em> • <em>[CONTEXT: full-time, internship, class project]</em></p>
+<h2 class="unnumbered">Research Experience</h2>
+<p><strong>Design space exploration for Pareto-optimal design of a Digitally Controlled Delay Line utilizing current starved and path choice methods</strong><br />
+Ken Mai and Jim Bain Research Group, Carnegie Mellon University <span class="sans-serif">Aug 2026 - Present (in preparation)</span></p>
 <ul>
-<li><p><em>[OUTCOME-FOCUSED BULLET — what changed because of this work]</em></p></li>
-<li><p><em>[SECOND BULLET]</em></p></li>
+<li><p>Leading investigation into a Pareto-optimal method to combine path choice and current starved Digitally Controlled Delay Line techniques.</p></li>
+<li><p>Investigating impact of existing implementations of path choice and current starved DCDL lines on range/resolution per unit area for PVT corners.</p></li>
+<li><p>Developing techniques for determining the optimal combination of path choice and current starved implementations.</p></li>
+<li><p>Verifying proposed techniques with brute force simulation on a small-scale model and directed simulation on a large-scale implementation.</p></li>
 </ul>
-<h2 class="unnumbered">Research</h2>
-<p><strong><em>[PROJECT / PAPER TITLE]</em></strong> <span class="sans-serif"><em>[START – END OR ONGOING]</em></span><br />
-<em>[GROUP / LAB]</em> • <em>[TEAM SIZE, IF RELEVANT]</em></p>
+<p><strong>IC I/O Harness on Commercial Processes and Tools</strong><br />
+Ken Mai and Jim Bain Research Group, Carnegie Mellon University <span class="sans-serif">Nov 2025 - Present</span></p>
 <ul>
-<li><p><em>[RESEARCH BULLET]</em></p></li>
+<li><p>Designed a portion of a taped-out ASIC with a focus on PLL, ring oscillators, and FPGA fabric in the TSMC 28nm PDK.</p></li>
+<li><p>Designed a ring oscillator and digital phase-locked loop for on-chip clock generation, enabling a 16-fold increase in on-chip clock frequency from 20 MHz to 320 MHz.</p></li>
+<li><p>Redesigning the PLL for a new tape-out, targeting a 400 MHz on-chip clock frequency.</p></li>
+<li><p>Verifying PLL behavior with SPICE simulation.</p></li>
+<li><p>Designed custom FPGA fabric to interface with the I/O Harness, helping students familiarize themselves with it without the complicated pitfalls of ASIC design.</p></li>
+<li><p>Designed a PCB carrier board to interface the finalized ASIC with an external FPGA for bring-up and post-silicon validation.</p></li>
+<li><p><strong>Technologies:</strong> RTL design in SystemVerilog, synthesis and simulation with Cadence.</p></li>
 </ul>
-<h2 class="unnumbered">Projects</h2>
-<p><strong><em>[PROJECT NAME]</em></strong> <span class="sans-serif"><em>[DATES]</em></span><br />
-<em>[TECH STACK]</em></p>
+<p><strong>Nanopositioning System for Lithography and Van der Waals Heterostructure Construction</strong><br />
+HackerFab, Carnegie Mellon University <span class="sans-serif">Sep 2025 - Dec 2025</span></p>
 <ul>
-<li><p><em>[WHAT IT DOES AND WHY IT IS INTERESTING]</em></p></li>
-<li><p><em>[REPO LINK, IF PUBLIC]</em></p></li>
+<li><p>Improved high-accuracy nanopositioning system resolution by an order of magnitude.</p></li>
+<li><p>Led a team that reduced the uncertainty in the positioning system to below 400nm.</p></li>
+<li><p><strong>Technologies:</strong> Embedded C++, CAD and CAM, piezoelectric nanopositioning.</p></li>
+</ul>
+<h2 class="unnumbered">Project Experience</h2>
+<p><strong>Standard Cell Library Design</strong> <span class="sans-serif">Apr 2026 - Present</span></p>
+<ul>
+<li><p>Designed a standard cell library in a 45nm planar PDK.</p></li>
+<li><p>Extracted parasitic behavior for use in timing characterization.</p></li>
+<li><p>Verified functionality and characterized performance with SPICE simulation.</p></li>
+<li><p>Cell library consisted of NAND, NOR, and NOT gates as well as DFF and latch circuits.</p></li>
+</ul>
+<p><strong>Physics Engine ASIC</strong> <span class="sans-serif">Dec 2025 - Present</span></p>
+<ul>
+<li><p>Tape out: Sky130 open source PDK; Fab: TinyTapeout.</p></li>
+<li><p>Implemented a falling sand simulation with output over VGA.</p></li>
+<li><p>QSPI memory controller reduced required on-chip memory to 1/8 of original size (from 96 bytes to 12 bytes).</p></li>
+<li><p>Complete ASIC design flow: RTL design, RTL simulation/debug, netlist generation, place and route, GDSII generation.</p></li>
+<li><p>Reduced clock cycles per physics simulation tick by a factor of three by adapting a physics simulation technique from graphics programming.</p></li>
+<li><p>Utilized RTL waveform debugging to fix bugs in the RTL design.</p></li>
+<li><p>Interfaced with external RAM hardware via QSPI, requiring intra-clock edge timing control.</p></li>
+<li><p>Leveraged fixed-delay digital buffers to ensure all protocols are obeyed.</p></li>
+<li><p>Constructed a test bench using Cocotb and Python, and verified functionality with assertions and constrained random testing.</p></li>
+</ul>
+<p><strong>Static Timing Analysis Tool</strong> <span class="sans-serif">Jan 2026 - May 2026</span></p>
+<ul>
+<li><p>Built a static timing analysis tool for the Yosys Open Synthesis Suite.</p></li>
+<li><p>Able to determine timing behavior of non-combinational loop netlists.</p></li>
+<li><p>Timing calculations using PVT corners ensure accuracy of results in all expected environmental conditions.</p></li>
+</ul>
+<p><strong>7-stage Patterson and Hennessy style RV32I Core</strong> <span class="sans-serif">Jan 2026 - May 2026</span></p>
+<ul>
+<li><p>Implemented an RV32I core in SystemVerilog with 7 pipeline stages.</p></li>
+<li><p>Maximal forwarding between pipeline stages minimized data-dependent stalling. The final implementation was more than 5 times faster than the naive approach using real-world RV32I programs.</p></li>
+<li><p>Designed a two-bit branch predictor with a branch target buffer that doubled accurate branch predictions from 40% to 80%.</p></li>
+<li><p>Implemented a cache-management solution that successfully arbitrated cache conflicts inherent in non-atomic bus snooping systems.</p></li>
+</ul>
+<p><strong>FP32 FPU and Neural Network Systolic Array</strong> <span class="sans-serif">Sep 2025 - Dec 2025</span></p>
+<ul>
+<li><p>Designed IEEE 754 compatible hardware for computing 32-bit floating point operations.</p></li>
+<li><p>Supports all arithmetic operations (add, subtract, multiply, divide).</p></li>
+<li><p>Performed mathematical modeling to optimize the addition system for power, performance, and area.</p></li>
+<li><p>Custom multiplication and division architecture enabled single-cycle operation and low-impact change to a highly pipelined design.</p></li>
+<li><p>Implemented the FP unit in a systolic array used to accelerate inference of a deep neural network.</p></li>
+</ul>
+<p><strong>Matrix Multiplication, Addition, and Inner Product Hardware</strong> <span class="sans-serif">Sep 2024 - Dec 2024</span></p>
+<ul>
+<li><p>Interfaced with DSP slices and ROMs on an Intel Altera DE10 FPGA.</p></li>
+<li><p>Coordination between all available DSP hard cores and ROM modules within 98% of the dataflow limit on the number of compute cycles.</p></li>
+</ul>
+<p><strong>Network-on-a-Chip</strong> <span class="sans-serif">Jan 2025 - May 2025</span></p>
+<ul>
+<li><p>Designed and simulated four port packet routing hardware supporting interconnected routers and fair packet flow between ports.</p></li>
+<li><p>Parallel FIFO buffers and internal counters ensure high throughput despite large data flow.</p></li>
+<li><p>Address logic enabled packet transmission through multiple routers to reach the destination.</p></li>
+<li><p>Internal data representation minimized packet latency through the router.</p></li>
+</ul>
+<p><strong>USB 2.0 Hardware</strong> <span class="sans-serif">Jan 2025 - May 2025</span></p>
+<ul>
+<li><p>Implemented read and write operations.</p></li>
+<li><p>8-way pipelined and parallelized design enables rapid data transmission and reception, 8 times faster than a serial design.</p></li>
+<li><p>Custom orchestration hardware enables device-to-device transfers without a host OS.</p></li>
+</ul>
+<p><strong>CPU Arithmetic Coprocessor and Microcode Modification</strong> <span class="sans-serif">Sep 2024 - Dec 2024</span></p>
+<ul>
+<li><p>Modified a multicycle CPU to support double-word arithmetic operations via microarchitecture changes to interface with an arithmetic coprocessor.</p></li>
+<li><p>Coprocessor design minimized instruction decode logic and microcode architecture, and eliminated software-based data dependence hazards using hardware solutions.</p></li>
+</ul>
+<p><strong>K Nearest Neighbor Inference Accelerator</strong> <span class="sans-serif">Sep 2025 - Dec 2025</span></p>
+<ul>
+<li><p>Designed a series of hardware threads that implemented the K Nearest Neighbor machine learning algorithm.</p></li>
+<li><p>Heavily pipelined design and Manhattan distance calculation maximized clock frequency.</p></li>
+<li><p>Exceeded 300 MHz timing requirement.</p></li>
+</ul>
+<p><strong>Decision Tree Training Accelerator</strong> <span class="sans-serif">Sep 2025 - Dec 2025</span></p>
+<ul>
+<li><p>Designed a series of hardware threads that accelerated decision tree machine learning algorithm training.</p></li>
+<li><p>Calculated Gini score using custom designed multiplication and division hardware threads.</p></li>
+<li><p>Leveraged arithmetic properties of numerical representation to bypass expensive computations.</p></li>
+<li><p>Custom hardware for square roots improved cycles per calculation from 11 to 1.</p></li>
+</ul>
+<p><strong>Lightweight Autonomous Vehicle Firmware, Robobuggy</strong> <span class="sans-serif">Jan 2023 - Present</span></p>
+<ul>
+<li><p>Designed, constructed, and maintained a high-performance embedded system in C++ over the course of four years. Lead designer for two of those years.</p></li>
+<li><p>Leveraged an existing embedded system architecture and carefully chosen consumer hardware to maximize performance per dollar.</p></li>
+<li><p>Embedded software engineering with hard real-time requirements and tight control loops. Average control loop time under 10 microseconds.</p></li>
+<li><p>Designed PCBs to interface microcontrollers with peripheral devices including GPS, servo actuators, accelerometers, encoders, and 433MHz radios.</p></li>
+<li><p>Collaborated with control-system experts to design an Unscented Kalman Filter to integrate disparate sensor streams into a cohesive whole.</p></li>
+</ul>
+<p><strong>Real-Time Operating System and Bootloader for ESP32</strong> <span class="sans-serif">Jan 2024 - May 2024</span></p>
+<ul>
+<li><p>Wrote bootloader and fixed priority preemptive scheduling RTOS for ESP32.</p></li>
+<li><p>Developed firmware for memory mapped and GPIO-based peripherals including USART/UART, H-Bridge BLDC motor controllers, rotational encoders, and LCD displays.</p></li>
 </ul>

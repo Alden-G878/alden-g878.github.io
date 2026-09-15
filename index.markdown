@@ -3,7 +3,10 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: home
-title: "Alden"
+# Was "Alden", which duplicated the site title and produced the page title
+# "Alden - Alden — Computer Engineering". MM appends `site.title` after this.
+# Leaving it unset makes the homepage title just the site title.
+title:
 permalink: /
 ---
 

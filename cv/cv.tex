@@ -1,37 +1,57 @@
 % ===========================================================================
-%  Alden — master CV (LaTeX source of truth)
+%  Alden Grover — master CV (LaTeX source of truth)
 % ===========================================================================
 %
-%  STATUS: STUB / PLACEHOLDER.
+%  Populated from the master CV. This file is the source for BOTH published
+%  artifacts:
 %
-%  This file exists so the /cv/ page can ship a real, inline-viewable PDF
-%  today. Every bracketed token such as [EMAIL] or [DEGREE] is a placeholder
-%  to be replaced with real content; none of it is a real claim about Alden.
-%  Do NOT fill these in with plausible-looking invented content — the master
-%  CV is the source, not this stub.
+%    assets/pdf/Alden_CV.pdf   the PDF (ATS / print / fidelity view)
+%    _includes/cv-live.html    the in-page HTML view
 %
-%  Once the real master CV arrives, replace the body below (and delete the
-%  "placeholder document" notice). Nothing else needs to change: the build in
-%  ../BUILD.md and the CV layout's tab code are content-agnostic.
+%  Rebuild with ./cv/build.sh (see ../BUILD.md). Never hand-edit either artifact.
+%
+%  CONTENT RULES:
+%    * This file is the source of truth. Keep it in step with _data/*.yml and
+%      the _projects/ + _research/ collections, which feed the interactive tab
+%      of /cv/ — the two views must not disagree.
+%    * Do not invent credentials, dates, or metrics. Everything here came from
+%      the master CV.
 %
 %  WRITING RULES (keep this file "pandoc-friendly" — see ../BUILD.md):
 %    * plain `article` + geometry + hyperref (all in texlive-latex-base/-recommended).
 %      Never switch to moderncv or an exotic template: pandoc's LaTeX -> HTML5
-%      conversion degrades badly on those, and Phase 2 renders this file as HTML
-%      on /cv/.
-%    * semantic \section{} and \itemize only.
+%      conversion degrades badly on those, and this file renders as HTML on /cv/.
+%    * semantic \section*{} and \itemize only.
 %    * no floats, minipages or multi-column tricks for anything that must
-%      appear in the on-page HTML view; multi-column output is fine for the
-%      PDF alone, but then it will not survive the HTML rendering.
-%    * dates and trailing metadata go through \cvwhen{} (defined below), never
-%      bare after \hfill — pandoc silently drops \hfill, losing the separation.
+%      appear in the on-page HTML view; two-column output would also risk
+%      interleaving the text layer, which ATS parsers read.
+%    * dates and trailing metadata go through \cvwhen{}, never bare after
+%      \hfill — pandoc silently drops \hfill, losing the separation.
+%    * use ASCII "--" for date ranges, not an en/em dash: it extracts cleanly
+%      for ATS matching and avoids PDFDocEncoding surprises in metadata.
 % ===========================================================================
 
 \documentclass[11pt,letterpaper]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[margin=1in]{geometry}
+
+% Margins are measured, not guessed: the master CV uses ~0.5in, which fits its
+% content in 3 pages. Rendering the same content with the default 1in margins
+% needed 5 — a real readability regression, since the master CV is the format
+% recruiters already expect. 0.6in gives a text width within a few points of
+% the master CV's while keeping a comfortable margin.
+%
+% Note this is deliberately NOT solved by shrinking the font. Dropping to a
+% smaller base size would change every EC font size used, invalidating the
+% fonts baked into the toolchain image (cv/warmup.tex) and costing ~1.5s of
+% mktexpk on the first run after each change. Widening the text block instead
+% keeps the line height and the baked fonts untouched.
+\usepackage[margin=0.5in]{geometry}
+% Times (PSNFSS), matching the master CV. Also narrower than Computer
+% Modern, which recovers roughly a page of length. times.sty is in the
+% PSNFSS bundle already present in texlive-latex-recommended.
+\usepackage{times}
 \usepackage[hidelinks]{hyperref}
 
 % --- ATS / copy-paste text layer --------------------------------------------
@@ -81,9 +101,16 @@
 % with plain lengths instead of the enumitem/parskip packages, which would
 % otherwise pull in ~1.4 GB of dependencies for two lines of setup.
 
-% No paragraph indent; a little air between paragraphs.
+% No paragraph indent. parskip is small on purpose: with ~20 entries each
+% separated by \vspace, a large parskip compounds and costs pages.
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
+\setlength{\parskip}{0pt}
+
+% Slightly tighter line spacing than the 11pt default (13.6pt). The master CV
+% runs ~13.2pt; 12.8pt keeps it legible while recovering vertical space.
+% \linespread scales leading only, so no new font sizes are introduced and the
+% toolchain image's baked fonts stay valid (see the geometry note above).
+\linespread{0.94}
 
 % --- PDF document metadata (ATS / recruiter tooling) -------------------------
 % Application tracking systems and recruiter tools read the PDF's document
@@ -97,28 +124,66 @@
 % effect in pdfTeX; the values are plain ASCII deliberately, since PDFDocEncoding
 % handles the em dash poorly in metadata strings.
 %
-% TODO(owner): add the surname here too, matching _config.yml's `name`.
 \hypersetup{
   pdftex,
-  pdftitle  = {Alden - Curriculum Vitae},
-  pdfauthor = {Alden},
-  pdfsubject= {Curriculum Vitae},
-  pdfkeywords={RTL design, verification, computer architecture, embedded systems, computer engineering},
+  pdftitle  = {Alden Grover - Curriculum Vitae},
+  pdfauthor = {Alden Grover},
+  pdfsubject= {Curriculum Vitae - Electrical and Computer Engineering},
+  pdfkeywords={RTL design, ASIC design, verification, computer architecture, embedded systems, computer engineering, SystemVerilog, tape out, FPGA},
 }
 
 % Compact bullet lists, applied per-list (plain LaTeX: valid inside \itemize,
 % and pandoc's LaTeX reader still sees ordinary itemize blocks).
 \newcommand{\tightlist}{%
-  \setlength{\itemsep}{1pt}%
+  \setlength{\itemsep}{0pt}%
   \setlength{\parskip}{0pt}%
-  \setlength{\topsep}{4pt}%
+  \setlength{\topsep}{1pt}%
+  \setlength{\parsep}{0pt}%
 }
 
-% --- Placeholder helper -----------------------------------------------------
-% Markers are VISIBLY bracketed and italic so a placeholder can never be
-% mistaken for real content in the rendered PDF.
-\newcommand{\ph}[1]{\textit{[#1]}}
-% ---------------------------------------------------------------------------
+% Separator between CV entries. A macro rather than a literal \vspace so the
+% spacing is uniform and adjustable in one place.
+\newcommand{\entrysep}{\vspace{2pt}}
+
+% --- Section heading spacing -------------------------------------------------
+% \section*{} is used throughout: no "1 2 3" numbering, which a CV does not
+% want, and pandoc renders it as an unnumbered <h2>.
+%
+% \cvsection wraps it so the surrounding vertical space can be tightened in one
+% place. article.cls gives \section* roughly 3.5ex above and 2.3ex below, which
+% across five sections costs about 12 lines — measured as 41 content lines on
+% page 1 versus 48 for the master CV this mirrors.
+%
+% The \vspace{} calls live INSIDE a macro, which matters for two reasons:
+%
+%   1. Pandoc-safe. Tuning the same space via \makeatletter / \@startsection is
+%      the obvious approach and silently BREAKS THE HTML VIEW: pandoc's LaTeX
+%      reader then fails to recognise every \section* in the file and emits no
+%      headings at all. Verified in isolation — identical \section*{} lines
+%      inside a \makeatletter block produce zero <h1>/<h2>, while the same lines
+%      inside this macro produce them correctly. cv/build.sh's "<h2" assertion
+%      catches that failure, which is precisely why the check exists.
+%   2. A macro keeps the spacing invisible to pandoc as content, so it cannot
+%      leak into the HTML as stray spacing text or an empty paragraph.
+%
+% A negative \vspace is used rather than a package: titlesec/titletoc live in
+% texlive-latex-extra, which this file deliberately avoids (see the
+% dependency note in the preamble).
+%
+% `\vspace*` (starred) rather than plain `\vspace` before the heading: LaTeX
+% discards a negative \vspace that is preceded by a \section's own
+% \addvspace scaffolding, so the plain form silently did nothing. The starred
+% form applies unconditionally. Measured: 26pt of space around each heading
+% with the plain form, versus the intended tighter spacing with the starred one.
+%
+% The values below are the LEAST aggressive of the settings that fit the CV in
+% 3 pages, matching the master CV it mirrors. Do not tighten further without
+% re-checking legibility — the aim is a readable CV, not a short one.
+\newcommand{\cvsection}[1]{%
+  \vspace*{-12pt}%
+  \section*{#1}%
+  \vspace*{-6pt}%
+}
 
 % --- Date / meta span ------------------------------------------------------
 % Wrapper for the dates and other trailing metadata on an entry.
@@ -130,7 +195,11 @@
 % conversion as `<span class="sans-serif">`, which gives the HTML a hook
 % (`.cv-doc .sans-serif` in assets/css/main.scss) and keeps the PDF unchanged.
 %
-% Write dates as:  \textbf{\ph{ROLE}} \hfill \cvwhen{\ph{DATES}}
+% Write dates as:  \textbf{ROLE} \hfill \cvwhen{START - END}, using a plain
+% ASCII hyphen for the range. Do NOT use LaTeX's "--": it typesets an en dash
+% (U+2013), which is no longer plain ASCII in the text layer and can defeat
+% literal date matching in an ATS. Verified: "Aug 2026 -- Present" extracted as
+% U+2013, while "Aug 2026 - Present" extracts as a hyphen.
 \newcommand{\cvwhen}[1]{\textsf{#1}}%
 % ---------------------------------------------------------------------------
 
@@ -139,65 +208,286 @@
 \begin{document}
 
 % ---- Header ---------------------------------------------------------------
+% Contact details are written as PLAIN TEXT, separated by \textbullet, rather
+% than as \href mailto:/tel: links. Two reasons:
+%
+%   1. ATS parsers match on literal text. A hyperlink can be extracted as
+%      "email me" while the address itself is lost, so the address is what must
+%      appear in the text layer.
+%   2. It mirrors the master CV's own header, so the two documents agree.
+%
+% The website and GitHub ARE linked, since a URL is both a link and literal text.
 \begin{center}
-  {\Large\bfseries Alden}\\[4pt]
-  \ph{YOUR EMAIL} \textbullet\ \ph{PHONE} \textbullet\ \ph{CITY, STATE}\\[2pt]
+  {\Large\bfseries Alden Grover}\\[4pt]
+  Pittsburgh, PA \textbullet\ aldengrover@gmail.com \textbullet\ 646-539-8055\\
+  \href{https://alden-g878.github.io}{alden-g878.github.io}
+  \textbullet\
   \href{https://github.com/alden-g878}{github.com/alden-g878}
-  \textbullet\ \ph{LINKEDIN URL}
 \end{center}
 
-% ---- Placeholder warning (delete once real content lands) -----------------
-\vspace{4pt}
-\noindent\textbf{Placeholder document.} This PDF was generated from the stub
-LaTeX file \texttt{cv/cv.tex}. It exists so that the in-page document viewer on
-\href{https://alden-g878.github.io/cv/}{/cv/} has a real file to render. The
-interactive CV on that page is the authoritative view; this document will be
-regenerated from the master CV once it is available.
-
 % ---- Summary --------------------------------------------------------------
-\section*{Summary}
-\ph{TWO OR THREE LINES OF SUMMARY — pulled from the master CV, not invented here}
+\cvsection{Summary}
+Seeking spring/summer 2027 internships in digital circuit and RTL design and
+research. BS/MS combined student with Ph.D. intent, open to industry roles
+between degrees.
 
 % ---- Education ------------------------------------------------------------
-\section*{Education}
-\textbf{\ph{INSTITUTION}} \hfill \cvwhen{\ph{EXPECTED GRADUATION}}\\
-\ph{DEGREE}, \ph{MAJOR / CONCENTRATION}\\
+\cvsection{Education}
+% Institution and location are deliberately on ONE line separated by a comma,
+% not split with \hfill. The master CV formats it this way, and it keeps the
+% string "Carnegie Mellon University, Pittsburgh, PA" intact in the text layer
+% for an ATS to match — \hfill would separate the two with a wide gap.
+\textbf{Carnegie Mellon University, Pittsburgh, PA} \\
+BS in Electrical and Computer Engineering, expected graduation December 2026 \\
+Expected MS in Electrical and Computer Engineering (combined MS/BS program),
+graduating 2028, with Ph.D. intent
 \begin{itemize}\tightlist
-  \item \ph{NOTABLE COURSEWORK — or delete this list entirely}
+  \item \textbf{Notable Classwork:} 18-447: Introduction to Computer
+    Architecture, 18-320: Microelectronic Circuits, 18-340: Hardware Arithmetic
+    for Machine Learning, 18-349: Introduction to Embedded Systems
 \end{itemize}
 
-% ---- Skills -------------------------------------------------------------
-\section*{Skills}
+% ---- Technical Skills ------------------------------------------------------
+\cvsection{Technical Skills}
 \begin{itemize}\tightlist
-  \item \textbf{Languages:} \ph{LANGUAGE LIST}
-  \item \textbf{Frameworks / Tools:} \ph{TOOL LIST}
-  \item \textbf{Other:} \ph{ANYTHING ELSE}
+  \item \textbf{RTL Design:} SystemVerilog, Verilog, ASIC RTL design and tape
+    out, FPGA design, TinyTapeout, networks on a chip, USB 2.0 hardware, finite
+    state machines for datapath control, VGA waveform generation
+  \item \textbf{RTL Verification and Simulation:} SystemVerilog testbenches,
+    Cocotb, RTL waveform debug, formal reachability proofs for FSMs, Static
+    Timing Analysis, Constrained Random Testing
+  \item \textbf{EDA:} Cadence Virtuoso, TSMC 28nm planar PDK, Sky130 PDK,
+    Generic 45nm planar PDK, KiCad
+  \item \textbf{Computer Architecture:} RV32I/M ISA and microcode, pipelining,
+    branch prediction, cache management and bus snooping
+  \item \textbf{Embedded Systems:} Embedded C++, RTOS development, bootloader
+    design, custom serial protocols, hard real-time systems, memory-mapped
+    peripheral firmware development
+  \item \textbf{Hardware Acceleration:} Systolic arrays, neural-network
+    inference, KNN acceleration, decision-tree acceleration, floating-point
+    arithmetic
+  \item \textbf{Languages:} C, C++, SystemVerilog, Python, Julia
+  \item \textbf{Tools:} Git and GitHub, PCB design, CAD, CAM
 \end{itemize}
 
-% ---- Experience ---------------------------------------------------------
-\section*{Experience}
-\textbf{\ph{ROLE}} \hfill \cvwhen{\ph{START -- END OR ONGOING}}\\
-\ph{ORGANISATION} \textbullet\ \ph{CONTEXT: full-time, internship, class project}
+% ---- Research Experience --------------------------------------------------
+\cvsection{Research Experience}
+
+\textbf{Design space exploration for Pareto-optimal design of a Digitally
+Controlled Delay Line utilizing current starved and path choice methods} \\
+Ken Mai and Jim Bain Research Group, Carnegie Mellon University \hfill
+\cvwhen{Aug 2026 - Present (in preparation)}
 \begin{itemize}\tightlist
-  \item \ph{OUTCOME-FOCUSED BULLET — what changed because of this work}
-  \item \ph{SECOND BULLET}
+  \item Leading investigation into a Pareto-optimal method to combine path
+    choice and current starved Digitally Controlled Delay Line techniques.
+  \item Investigating impact of existing implementations of path choice and
+    current starved DCDL lines on range/resolution per unit area for PVT
+    corners.
+  \item Developing techniques for determining the optimal combination of path
+    choice and current starved implementations.
+  \item Verifying proposed techniques with brute force simulation on a
+    small-scale model and directed simulation on a large-scale implementation.
 \end{itemize}
 
-% ---- Research -----------------------------------------------------------
-\section*{Research}
-\textbf{\ph{PROJECT / PAPER TITLE}} \hfill \cvwhen{\ph{START -- END OR ONGOING}}\\
-\ph{GROUP / LAB} \textbullet\ \ph{TEAM SIZE, IF RELEVANT}
+\entrysep
+\textbf{IC I/O Harness on Commercial Processes and Tools} \\
+Ken Mai and Jim Bain Research Group, Carnegie Mellon University \hfill
+\cvwhen{Nov 2025 - Present}
 \begin{itemize}\tightlist
-  \item \ph{RESEARCH BULLET}
+  \item Designed a portion of a taped-out ASIC with a focus on PLL, ring
+    oscillators, and FPGA fabric in the TSMC 28nm PDK.
+  \item Designed a ring oscillator and digital phase-locked loop for on-chip
+    clock generation, enabling a 16-fold increase in on-chip clock frequency
+    from 20 MHz to 320 MHz.
+  \item Redesigning the PLL for a new tape-out, targeting a 400 MHz on-chip
+    clock frequency.
+  \item Verifying PLL behavior with SPICE simulation.
+  \item Designed custom FPGA fabric to interface with the I/O Harness, helping
+    students familiarize themselves with it without the complicated pitfalls
+    of ASIC design.
+  \item Designed a PCB carrier board to interface the finalized ASIC with an
+    external FPGA for bring-up and post-silicon validation.
+  \item \textbf{Technologies:} RTL design in SystemVerilog, synthesis and
+    simulation with Cadence.
 \end{itemize}
 
-% ---- Projects -----------------------------------------------------------
-\section*{Projects}
-\textbf{\ph{PROJECT NAME}} \hfill \cvwhen{\ph{DATES}}\\
-\ph{TECH STACK}
+\entrysep
+\textbf{Nanopositioning System for Lithography and Van der Waals
+Heterostructure Construction} \\
+HackerFab, Carnegie Mellon University \hfill \cvwhen{Sep 2025 - Dec 2025}
 \begin{itemize}\tightlist
-  \item \ph{WHAT IT DOES AND WHY IT IS INTERESTING}
-  \item \ph{REPO LINK, IF PUBLIC}
+  \item Improved high-accuracy nanopositioning system resolution by an order of
+    magnitude.
+  \item Led a team that reduced the uncertainty in the positioning system to
+    below 400nm.
+  \item \textbf{Technologies:} Embedded C++, CAD and CAM, piezoelectric
+    nanopositioning.
+\end{itemize}
+
+% ---- Project Experience ---------------------------------------------------
+\cvsection{Project Experience}
+
+\textbf{Standard Cell Library Design} \hfill \cvwhen{Apr 2026 - Present}
+\begin{itemize}\tightlist
+  \item Designed a standard cell library in a 45nm planar PDK.
+  \item Extracted parasitic behavior for use in timing characterization.
+  \item Verified functionality and characterized performance with SPICE
+    simulation.
+  \item Cell library consisted of NAND, NOR, and NOT gates as well as DFF and
+    latch circuits.
+\end{itemize}
+
+\entrysep
+\textbf{Physics Engine ASIC} \hfill \cvwhen{Dec 2025 - Present}
+\begin{itemize}\tightlist
+  \item Tape out: Sky130 open source PDK; Fab: TinyTapeout.
+  \item Implemented a falling sand simulation with output over VGA.
+  \item QSPI memory controller reduced required on-chip memory to 1/8 of
+    original size (from 96 bytes to 12 bytes).
+  \item Complete ASIC design flow: RTL design, RTL simulation/debug, netlist
+    generation, place and route, GDSII generation.
+  \item Reduced clock cycles per physics simulation tick by a factor of three
+    by adapting a physics simulation technique from graphics programming.
+  \item Utilized RTL waveform debugging to fix bugs in the RTL design.
+  \item Interfaced with external RAM hardware via QSPI, requiring intra-clock
+    edge timing control.
+  \item Leveraged fixed-delay digital buffers to ensure all protocols are
+    obeyed.
+  \item Constructed a test bench using Cocotb and Python, and verified
+    functionality with assertions and constrained random testing.
+\end{itemize}
+
+\entrysep
+\textbf{Static Timing Analysis Tool} \hfill \cvwhen{Jan 2026 - May 2026}
+\begin{itemize}\tightlist
+  \item Built a static timing analysis tool for the Yosys Open Synthesis Suite.
+  \item Able to determine timing behavior of non-combinational loop netlists.
+  \item Timing calculations using PVT corners ensure accuracy of results in all
+    expected environmental conditions.
+\end{itemize}
+
+\entrysep
+\textbf{7-stage Patterson and Hennessy style RV32I Core} \hfill
+\cvwhen{Jan 2026 - May 2026}
+\begin{itemize}\tightlist
+  \item Implemented an RV32I core in SystemVerilog with 7 pipeline stages.
+  \item Maximal forwarding between pipeline stages minimized data-dependent
+    stalling. The final implementation was more than 5 times faster than the
+    naive approach using real-world RV32I programs.
+  \item Designed a two-bit branch predictor with a branch target buffer that
+    doubled accurate branch predictions from 40\% to 80\%.
+  \item Implemented a cache-management solution that successfully arbitrated
+    cache conflicts inherent in non-atomic bus snooping systems.
+\end{itemize}
+
+\entrysep
+\textbf{FP32 FPU and Neural Network Systolic Array} \hfill
+\cvwhen{Sep 2025 - Dec 2025}
+\begin{itemize}\tightlist
+  \item Designed IEEE 754 compatible hardware for computing 32-bit floating
+    point operations.
+  \item Supports all arithmetic operations (add, subtract, multiply, divide).
+  \item Performed mathematical modeling to optimize the addition system for
+    power, performance, and area.
+  \item Custom multiplication and division architecture enabled single-cycle
+    operation and low-impact change to a highly pipelined design.
+  \item Implemented the FP unit in a systolic array used to accelerate
+    inference of a deep neural network.
+\end{itemize}
+
+\entrysep
+\textbf{Matrix Multiplication, Addition, and Inner Product Hardware} \hfill
+\cvwhen{Sep 2024 - Dec 2024}
+\begin{itemize}\tightlist
+  \item Interfaced with DSP slices and ROMs on an Intel Altera DE10 FPGA.
+  \item Coordination between all available DSP hard cores and ROM modules
+    within 98\% of the dataflow limit on the number of compute cycles.
+\end{itemize}
+
+\entrysep
+\textbf{Network-on-a-Chip} \hfill \cvwhen{Jan 2025 - May 2025}
+\begin{itemize}\tightlist
+  \item Designed and simulated four port packet routing hardware supporting
+    interconnected routers and fair packet flow between ports.
+  \item Parallel FIFO buffers and internal counters ensure high throughput
+    despite large data flow.
+  \item Address logic enabled packet transmission through multiple routers to
+    reach the destination.
+  \item Internal data representation minimized packet latency through the
+    router.
+\end{itemize}
+
+\entrysep
+\textbf{USB 2.0 Hardware} \hfill \cvwhen{Jan 2025 - May 2025}
+\begin{itemize}\tightlist
+  \item Implemented read and write operations.
+  \item 8-way pipelined and parallelized design enables rapid data transmission
+    and reception, 8 times faster than a serial design.
+  \item Custom orchestration hardware enables device-to-device transfers
+    without a host OS.
+\end{itemize}
+
+\entrysep
+\textbf{CPU Arithmetic Coprocessor and Microcode Modification} \hfill
+\cvwhen{Sep 2024 - Dec 2024}
+\begin{itemize}\tightlist
+  \item Modified a multicycle CPU to support double-word arithmetic operations
+    via microarchitecture changes to interface with an arithmetic coprocessor.
+  \item Coprocessor design minimized instruction decode logic and microcode
+    architecture, and eliminated software-based data dependence hazards using
+    hardware solutions.
+\end{itemize}
+
+\entrysep
+\textbf{K Nearest Neighbor Inference Accelerator} \hfill
+\cvwhen{Sep 2025 - Dec 2025}
+\begin{itemize}\tightlist
+  \item Designed a series of hardware threads that implemented the K Nearest
+    Neighbor machine learning algorithm.
+  \item Heavily pipelined design and Manhattan distance calculation maximized
+    clock frequency.
+  \item Exceeded 300 MHz timing requirement.
+\end{itemize}
+
+\entrysep
+\textbf{Decision Tree Training Accelerator} \hfill \cvwhen{Sep 2025 - Dec 2025}
+\begin{itemize}\tightlist
+  \item Designed a series of hardware threads that accelerated decision tree
+    machine learning algorithm training.
+  \item Calculated Gini score using custom designed multiplication and division
+    hardware threads.
+  \item Leveraged arithmetic properties of numerical representation to bypass
+    expensive computations.
+  \item Custom hardware for square roots improved cycles per calculation from
+    11 to 1.
+\end{itemize}
+
+\entrysep
+\textbf{Lightweight Autonomous Vehicle Firmware, Robobuggy} \hfill
+\cvwhen{Jan 2023 - Present}
+\begin{itemize}\tightlist
+  \item Designed, constructed, and maintained a high-performance embedded
+    system in C++ over the course of four years. Lead designer for two of those
+    years.
+  \item Leveraged an existing embedded system architecture and carefully chosen
+    consumer hardware to maximize performance per dollar.
+  \item Embedded software engineering with hard real-time requirements and
+    tight control loops. Average control loop time under 10 microseconds.
+  \item Designed PCBs to interface microcontrollers with peripheral devices
+    including GPS, servo actuators, accelerometers, encoders, and 433MHz radios.
+  \item Collaborated with control-system experts to design an Unscented Kalman
+    Filter to integrate disparate sensor streams into a cohesive whole.
+\end{itemize}
+
+\entrysep
+\textbf{Real-Time Operating System and Bootloader for ESP32} \hfill
+\cvwhen{Jan 2024 - May 2024}
+\begin{itemize}\tightlist
+  \item Wrote bootloader and fixed priority preemptive scheduling RTOS for
+    ESP32.
+  \item Developed firmware for memory mapped and GPIO-based peripherals
+    including USART/UART, H-Bridge BLDC motor controllers, rotational encoders,
+    and LCD displays.
 \end{itemize}
 
 \end{document}

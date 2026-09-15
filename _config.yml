@@ -31,7 +31,7 @@ locale: "en-US"
 # and indexable, and every page title currently reads just "Alden", so a
 # recruiter searching for a full name will not match. Kept short until
 # confirmed rather than guessed.
-name: "Alden"
+name: "Alden Grover"
 title: "Alden — Computer Engineering"
 # TODO(owner): the stock Jekyll placeholder shipped here before. This version is
 # factual and matches _data/education.yml; replace with a real one-liner once the
@@ -56,9 +56,9 @@ minimal_mistakes_skin: "default" # "default", "air", "aqua", "contrast", "dark",
 
 # Author profile shown in the sidebar
 author:
-  name: "Alden"
+  name: "Alden Grover"
   avatar: # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
-  bio: # short bio shown under the avatar
+  bio: "ECE at Carnegie Mellon. RTL design, verification, and computer architecture."
   links:
     - label: "GitHub"
       icon: "fab fa-fw fa-github"

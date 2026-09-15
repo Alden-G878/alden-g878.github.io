@@ -1,26 +1,66 @@
-# Nested by category; used by both the CV skills block and the portfolio filter chips.
-# TODO(owner): confirm exact items once the master CV is parsed.
-# Keys are the site's own category vocabulary (see _data/categories.yml).
+# Skills, grouped by category. Single source of truth for the /cv/ page's
+# "Technical Skills" block.
+#
+# Keys are the site's own category vocabulary (see _data/categories.yml). The
+# lists are kept in step with the Technical Skills section of cv/cv.tex, which
+# is the master CV — the interactive tab and the document tab of /cv/ must not
+# disagree. If you add a skill here, add it there too.
 "RTL Design":
-  - "[Placeholder — populate from master CV]"
+  - "SystemVerilog"
+  - "Verilog"
+  - "ASIC RTL design and tape out"
+  - "FPGA design"
+  - "TinyTapeout"
+  - "Networks on a chip"
+  - "USB 2.0 hardware"
+  - "Finite state machines for datapath control"
+  - "VGA waveform generation"
 
 "Verification":
-  - "[Placeholder — populate from master CV]"
+  - "SystemVerilog testbenches"
+  - "Cocotb"
+  - "RTL waveform debug"
+  - "Formal reachability proofs for FSMs"
+  - "Static Timing Analysis"
+  - "Constrained Random Testing"
 
 "EDA":
-  - "[Placeholder — populate from master CV]"
+  - "Cadence Virtuoso"
+  - "TSMC 28nm planar PDK"
+  - "Sky130 PDK"
+  - "Generic 45nm planar PDK"
+  - "KiCad"
 
 "Computer Architecture":
-  - "[Placeholder — populate from master CV]"
+  - "RV32I/M ISA and microcode"
+  - "Pipelining"
+  - "Branch prediction"
+  - "Cache management and bus snooping"
 
 "Embedded Systems":
-  - "[Placeholder — populate from master CV]"
+  - "Embedded C++"
+  - "RTOS development"
+  - "Bootloader design"
+  - "Custom serial protocols"
+  - "Hard real-time systems"
+  - "Memory-mapped peripheral firmware development"
 
 "Hardware Acceleration":
-  - "[Placeholder — populate from master CV]"
+  - "Systolic arrays"
+  - "Neural-network inference"
+  - "KNN acceleration"
+  - "Decision-tree acceleration"
+  - "Floating-point arithmetic"
 
 "Languages":
-  - "[Placeholder — populate from master CV]"
+  - "C"
+  - "C++"
+  - "SystemVerilog"
+  - "Python"
+  - "Julia"
 
 "Tools":
-  - "[Placeholder — populate from master CV]"
+  - "Git and GitHub"
+  - "PCB design"
+  - "CAD"
+  - "CAM"

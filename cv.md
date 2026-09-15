@@ -6,5 +6,6 @@ title: "CV"
 permalink: /cv/
 ---
 
-Short intro paragraph goes here — edit `cv.md` to add a few lines of summary
-once the master CV is parsed.
+Seeking spring/summer 2027 internships in digital circuit and RTL design and
+research. BS/MS combined student with Ph.D. intent, open to industry roles
+between degrees.

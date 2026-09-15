@@ -1,10 +1,18 @@
-# Institution, degree, classwork — single source of truth for the CV page.
-# TODO(owner): fill expected graduation, GPA (only if you want it public),
-# and notable classwork once the master CV is parsed.
-institution: "Carnegie Mellon University"
-degree: "B.S. Computer Engineering" # TODO: confirm against CV
-expected_graduation: null # TODO: fill from CV (e.g. 2027-05)
-gpa: null # intentionally null — shown on CV only if provided
+# Institution, degree, classwork — single source of truth for the /cv/ page.
+#
+# Kept in step with cv/cv.tex, which is the master CV. The two views of /cv/
+# (the interactive tab, built from these files, and the document tab, rendered
+# from cv.tex) must not disagree — see cv/BUILD.md.
+institution: "Carnegie Mellon University, Pittsburgh, PA"
+# Was "B.S. Computer Engineering", which contradicted the master CV: the degree
+# is Electrical and Computer Engineering.
+degree: "BS in Electrical and Computer Engineering"
+expected_graduation: "December 2026"
+# Second degree, specific to this site: the combined MS/BS programme.
+expected_ms: "Expected MS in Electrical and Computer Engineering (combined MS/BS program), graduating 2028, with Ph.D. intent"
+gpa: null # intentionally null — not published on the master CV
 notable_classwork:
-  # TODO: from CV
-  - "[Placeholder — populate from master CV]"
+  - "18-447: Introduction to Computer Architecture"
+  - "18-320: Microelectronic Circuits"
+  - "18-340: Hardware Arithmetic for Machine Learning"
+  - "18-349: Introduction to Embedded Systems"

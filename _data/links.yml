@@ -1,15 +1,15 @@
-# Contact + resume paths. These are the ONLY source of machine-readable contact
-# info on the site: /contact/ and the CV header both render from here.
+# Contact details, taken from the master CV (cv/cv.tex). These are the ONLY
+# source of contact info on the site: the /contact/ page, the CV header, and
+# the JSON-LD block in _includes/head/custom.html all read from here.
 #
-# TODO(owner): fill email / linkedin / location. All three are null, so the site
-# currently ships no contact method at all — nothing is emitted as a `mailto:`
-# or `tel:` link, and a parser cannot extract a way to reach Alden. This is the
-# single biggest gap for ATS and recruiter tooling (verified 2026-09-14).
-# Set them here rather than in a page so every consumer picks them up at once.
+# The address and phone also appear as PLAIN TEXT in the PDF header, which is
+# what an ATS extracts — see the note in cv/cv.tex.
 github: "https://github.com/alden-g878"
-linkedin: null # TODO: fill, e.g. "https://www.linkedin.com/in/<handle>"
-email: null # TODO: fill — enables a mailto: link everywhere it is rendered
-location: null # TODO: fill, e.g. "Pittsburgh, PA"
+# Not on the master CV. Left null rather than guessed.
+linkedin: null
+email: "aldengrover@gmail.com"
+location: "Pittsburgh, PA"
+phone: "646-539-8055"
 # ATS-ready PDF. GENERATED from cv/cv.tex — do not hand-edit.
 # Rebuild with ./cv/build.sh (see cv/BUILD.md).
 resume_pdf: "/assets/pdf/Alden_CV.pdf"
