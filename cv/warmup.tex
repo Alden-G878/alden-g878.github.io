@@ -1,0 +1,108 @@
+% Build-time font warm-up — NOT part of the CV. Never compiled into an artifact.
+%
+% cv/Dockerfile compiles this once so the EC/LModern fonts and LaTeX format
+% files are baked into the toolchain image. That turns the per-run cost of the
+% PDF from ~2.0 s (regenerating fonts via mktexpk every time) into ~0.44 s.
+%
+% The preamble deliberately mirrors cv/cv.tex's essentials, because the point is
+% to prime the same engine configuration and font encoding. The body then uses
+% every font family and every size the CV needs, so their PK files all exist
+% before a real run.
+%
+% If cv.tex later starts using a font shape or size that is not exercised here,
+% the first run will regenerate just that font (~1.5 s, once) — the build still
+% succeeds, so this file is a performance hint, not a correctness dependency.
+
+% The preamble and class options MUST mirror cv/cv.tex exactly, because EC font
+% sizes are derived from the document's base point size. A bare \documentclass
+% {article} is 10pt, so \normalsize is ecrm1000 — but cv.tex is 11pt, where
+% \normalsize is 10.95pt (ecrm1095). Warming up 1000-series fonts against an
+% 11pt document bakes 16 fonts that are never used and leaves the 8 that ARE
+% used to be generated at run time, so the warm-up silently does nothing.
+% (Measured: the real CV generated ecrm1095, ecbx1095, ecbi1095, ecti1095,
+% ecsi1095, ectt1095, tcrm1095, ecbx1440 on every run.)
+%
+% If cv.tex's class options or fontencoding change, update this file to match or
+% the warm-up becomes a no-op again.
+
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage[hidelinks]{hyperref}
+\usepackage[expansion=false]{microtype}
+\DisableLigatures{encoding = T1, family = *}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\pagestyle{empty}
+
+\begin{document}
+
+% Systematically exercise EVERY EC family at EVERY size the document class can
+% produce, rather than hand-listing the combinations that happened to be needed
+% today. Hand-listing is what broke the first attempt: it missed ecbx1440, so one
+% font was still generated at run time. A sweep cannot go stale when cv.tex gains
+% a new heading style, and the cost is a few hundred KB of PK files, once.
+%
+% \usefont takes NFSS family names, which are the CM names (cmr, cmss, cmtt) —
+% NOT the EC file names (ecrm, ecss). The .fd files map NFSS -> EC file, e.g.
+% t1cmr.fd has \EC@family{T1}{cmr}{bx}{it}{ecbi}, so {cmr}{bx}{it} produces
+% ecbi1095. Using ecrm/ecss here silently selects nothing and bakes no fonts —
+% it looks right and does nothing, which is exactly how the first sweep failed.
+% The eight EC families are the cross product of cmr/cmss/cmtt with series/shape.
+\newcommand{\sweep}[1]{%
+  \fontsize{#1}{#1}\selectfont
+  \usefont{T1}{cmr}{m}{n}rm \usefont{T1}{cmr}{bx}{n}bx \usefont{T1}{cmr}{m}{it}it
+  \usefont{T1}{cmr}{bx}{it}bi \usefont{T1}{cmr}{m}{sc}sc \usefont{T1}{cmr}{m}{sl}sl
+  \usefont{T1}{cmss}{m}{n}ss \usefont{T1}{cmss}{bx}{n}sx \usefont{T1}{cmss}{m}{sl}ssi
+  \usefont{T1}{cmtt}{m}{n}tt\par
+}
+
+% TS1 (the "text companion" encoding) supplies symbols such as \textbullet, which
+% cv.tex uses as the separator on its contact line. Its roman font is tcrm, and it
+% is selected via a DIFFERENT encoding, so the T1 sweep above never reaches it.
+% Measured: without this, tcrm1095 was generated on every single run.
+\newcommand{\sweepTSone}[1]{%
+  \fontsize{#1}{#1}\selectfont
+  \usefont{TS1}{cmr}{m}{n}tcrm \usefont{TS1}{cmr}{bx}{n}tcbx
+  \usefont{TS1}{cmss}{m}{n}tcsi \usefont{TS1}{cmtt}{m}{n}tctt\par
+}
+
+% The sizes the 11pt article class produces, from \tiny through \Huge.
+\sweep{6}      % \tiny
+\sweep{8}      % \scriptsize
+\sweep{9}      % \footnotesize
+\sweep{10}     % \small
+\sweep{10.95}  % \normalsize
+\sweep{12}     % \large
+\sweep{14.4}   % \Large
+\sweep{17.28}  % \LARGE
+\sweep{20.74}  % \huge
+\sweep{24.88}  % \Huge
+
+% The same sweep for TS1 symbols (see \sweepTSone above).
+\sweepTSone{10.95}
+\sweepTSone{14.4}
+
+% \textbullet is how cv.tex separates contact details, so exercise the exact
+% markup path too, not just the font selection. Plain text rather than cv.tex's
+% \ph{} macro, which is deliberately not defined here.
+\usefont{T1}{cmr}{m}{n}\selectfont
+EMAIL \textbullet\ PHONE \textbullet\ CITY\\
+
+% Also run the normal markup paths, so anything the sweep does not cover directly
+% (list setup, bold+italic nesting, the sans-serif \cvwhen style) is exercised.
+\usefont{T1}{ecrm}{m}{n}\selectfont
+\textbf{Title} \textsf{Date} \textit{Placeholder}
+\textbf{\textsf{Bold Sans}} \textit{\textsf{Italic Sans}}
+\textbf{\textit{Bold Italic}} \textbf{\itshape Bold Italic Two}
+
+\begin{itemize}
+  \item A bullet so the itemize font setup is cached.
+\end{itemize}
+
+Alden • github.com/alden-g878 • Universit\'e na\"ive — accents and separators.
+
+\end{document}

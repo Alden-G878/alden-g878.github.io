@@ -155,7 +155,7 @@ defaults:
 exclude:
   - "*.psd"
   - "*.sh"
-  - docs/ # internal handoff/spec docs — not part of the public site
+  - docs/ # internal design/plan docs — not part of the public site
   - cv/ # LaTeX master (cv.tex) + BUILD.md — source for assets/pdf/Alden_CV.pdf, never served
 #   - vendor/cache/
 #   - vendor/gems/

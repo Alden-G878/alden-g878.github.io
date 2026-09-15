@@ -14,12 +14,13 @@
 # Ordering note: cv/build.sh MUST run before `jekyll build`, since _layouts/cv.html
 # includes cv-live.html and Jekyll reads it at render time.
 #
-# See docs/phase2-implementation-plan.md and cv/BUILD.md.
+# See cv/BUILD.md for the build details and docs/build-performance-plan.md for why
+# the toolchain image exists and how it is cached below.
 #
-# Action versions: major tags, refreshed deliberately (see §7 of the plan, "Action
-# versions rot"). These are intentionally NOT pinned to SHAs, to stay consistent
-# with how the rest of this repo tracks dependencies (the Gemfile uses `~>`
-# constraints); revisit if a supply-chain policy is adopted.
+# Action versions: major tags, refreshed deliberately. They are intentionally NOT
+# pinned to SHAs, to stay consistent with how the rest of this repo tracks
+# dependencies (the Gemfile uses `~>` constraints); revisit if a supply-chain
+# policy is adopted.
 
 name: Deploy site to Pages
 
@@ -70,17 +71,63 @@ jobs:
         id: pages
         uses: actions/configure-pages@v6
 
+      # Warm the Docker layer cache for the CV toolchain image.
+      #
+      # cv/build.sh builds cv/Dockerfile on first use — TeX Live + pandoc +
+      # poppler, ~45 s. Without this the runner rebuilds it from scratch on every
+      # push, because GitHub-hosted runners are ephemeral. With type=gha the
+      # layers are restored from the Actions cache, so a normal run only has to
+      # execute the build steps (a few seconds) rather than download and install
+      # a TeX distribution.
+      #
+      # `scope=` keys the cache per branch; `ignore-error=true` means a cache
+      # miss or an outage degrades to a cold build instead of failing the deploy
+      # — the build is correct either way, just slower once.
+      #
+      # This lives in the workflow rather than in cv/build.sh on purpose: the
+      # script stays host-agnostic, and GHA cache semantics are GitHub-specific.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Ask cv/build.sh what tag it will look for, so the image cached below is
+      # named identically. Hardcoding a tag here would make build.sh miss the
+      # cached image and rebuild it from scratch, silently wasting the cache.
+      - name: Resolve the CV toolchain image tag
+        id: cv_image
+        run: |
+          chmod +x cv/build.sh
+          echo "tag=$(./cv/build.sh --print-image-tag)" >> "$GITHUB_OUTPUT"
+
+      - name: Build or restore the CV toolchain image
+        uses: docker/build-push-action@v6
+        with:
+          context: cv/
+          file: cv/Dockerfile
+          # Load into the local daemon so cv/build.sh finds the image by tag and
+          # skips its own build. `load` requires the default docker driver.
+          load: true
+          tags: ${{ steps.cv_image.outputs.tag }}
+          cache-from: type=gha,scope=cv-tex
+          cache-to: type=gha,mode=max,scope=cv-tex
+          # type=gha needs an explicit provenance off: the cache exporter writes
+          # attestations that the local docker daemon cannot load, which would
+          # make the step fail after a successful build.
+          provenance: false
+          # A cache failure must not break the deploy; build.sh will build it.
+          ignore-error: true
+
       # Compiles cv/cv.tex into BOTH artifacts, overwriting the committed copies.
       # Fails the job if pandoc emits no headings or if the PDF text layer is
-      # broken (ligatures extracting as "le") — see the self-checks in the script.
+      # broken — either the pdfTeX ligature signature or Unicode ligatures
+      # (U+FB00-U+FB04), which the stricter check now also rejects.
       - name: Regenerate CV artifacts (pdfTeX + pandoc)
         run: |
           chmod +x cv/build.sh
           ./cv/build.sh
 
       # The committed copy of cv-live.html must match what cv/cv.tex produces.
-      # This is checkable because the pandoc output is byte-deterministic
-      # (verified across runs — docs/phase2-implementation-plan.md §9).
+      # This is checkable because the pandoc output is byte-deterministic, while
+      # the PDF is not (see cv/BUILD.md §3).
       #
       # `git status --porcelain` rather than `git diff --quiet`: diff compares
       # the index against the worktree and is blind to untracked files, so it

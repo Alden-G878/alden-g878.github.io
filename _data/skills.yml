@@ -1,6 +1,6 @@
 # Nested by category; used by both the CV skills block and the portfolio filter chips.
 # TODO(owner): confirm exact items once the master CV is parsed.
-# Keys mirror the handoff's vocabulary; values are skill lists.
+# Keys are the site's own category vocabulary (see _data/categories.yml).
 "RTL Design":
   - "[Placeholder — populate from master CV]"
 

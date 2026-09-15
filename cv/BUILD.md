@@ -13,10 +13,10 @@ Sections: **1** regenerate the artifacts · **2** verify before pushing ·
 **3** what CI checks · **4** deploy · **5** verify the PDF text layer ·
 **6** gotchas · **7** pandoc-friendly rules · **8** what is committed ·
 **9** content discipline.
-
 > ⚠️ **Current status:** `cv/cv.tex` is a *stub*. Every `[BRACKETED]` token is a
 > placeholder, and the PDF says so in its own body text. Replace the stub with
-> the real master CV (handoff open question #4), then re-run `cv/build.sh`.
+> the real master CV once it is available, then re-run `cv/build.sh`. Do not
+> invent content to fill the placeholders — see §9.
 >
 > **Infrastructure status:** `.github/workflows/deploy.yml` is committed. The one
 > remaining manual step is switching *Settings → Pages → Source* to **GitHub
@@ -34,18 +34,90 @@ Sections: **1** regenerate the artifacts · **2** verify before pushing ·
 ./cv/build.sh               # both artifacts
 ./cv/build.sh --html-only   # just _includes/cv-live.html (seconds; no TeX)
 ./cv/build.sh --pdf-only    # just assets/pdf/Alden_CV.pdf
+./cv/build.sh --host        # force the host toolchain (skip Docker)
+./cv/build.sh --docker      # force Docker (ignore host binaries)
+./cv/build.sh --force-image # rebuild the Docker toolchain image
+./cv/build.sh --help        # full usage
 ```
 
-The script needs Docker, so no TeX or pandoc installation is required on the
-host. It runs two pinned containers:
+A full rebuild takes **about 0.75 s** on the Docker path once the toolchain image
+exists (it used to take ~30 s — see §1.3).
 
-| Artifact | Tool | Pinned image |
+### 1.1 Toolchain selection
+
+The script picks a toolchain automatically, in this order:
+
+| Priority | Toolchain | When | Pinned? |
+|---|---|---|---|
+| 1 | **Docker** (`cv/Dockerfile`) | Docker is available | ✅ Ubuntu 24.04 + pandoc 3.11 (sha256-verified) |
+| 2 | **Host binaries** | no Docker, but `pdflatex` **and** `pandoc` are on `PATH` | ❌ whatever you installed |
+| 3 | — | neither available | exits with an explanation |
+
+Docker is preferred because it is pinned and reproducible. **GitHub's runners
+already have Docker** and do *not* ship pandoc or TeX Live, so CI always uses
+path 1. If Docker is unavailable but you have a TeX distribution, path 2 builds
+the same artifacts with whatever versions you have — the HTML output is
+byte-identical to the Docker path for the same pandoc version (verified).
+
+### 1.2 The toolchain image
+
+Everything lives in one image, described by `cv/Dockerfile`:
+
+| Component | Purpose |
+|---|---|
+| `texlive-latex-base` / `-recommended` / `-fonts-recommended` | `pdflatex` + fontenc/inputenc/geometry/hyperref/microtype and the EC/LModern fonts |
+| `pandoc` **3.11** | the HTML view, fetched from the GitHub release as a `.deb` and **sha256-verified** |
+| `poppler-utils` | `pdftotext`, so the text-layer check (§5) runs even on hosts without poppler |
+| `cv/warmup.tex` compiled once | bakes the EC/LModern PK fonts so no run regenerates them (§1.3) |
+
+The image is tagged by a **hash of `cv/Dockerfile` + `cv/warmup.tex`**, so editing
+either automatically invalidates it and forces a rebuild — a stale image can
+never silently persist. `./cv/build.sh --print-image-tag` prints the tag it will
+look for, which is how the CI workflow caches the image under the right name.
+
+> ⚠️ **Do not** try to `COPY --from=pandoc/core`. That image is **Alpine/musl**,
+> so its binary cannot run in this glibc image — it fails at exec with
+> *no such file or directory* because `ld-musl-x86_64.so.1` is missing. Use the
+> release `.deb`, as the Dockerfile does. Also note that `apt install pandoc` on
+> Ubuntu 24.04 gives **3.1.3**, not 3.11, which would change the generated HTML.
+
+### 1.3 Why the build is fast
+
+The original recipe ran `apt-get update && apt-get install texlive-*` on **every
+invocation**, which was ~26 s of a ~30 s build — repeated on every local edit and
+on every CI push, since GitHub-hosted runners have no Docker layer cache.
+
+Measured on this repository:
+
+| Configuration | One-time | Every run |
 |---|---|---|
-| `assets/pdf/Alden_CV.pdf` | `pdflatex` | `ubuntu:24.04` + `texlive-latex-base`/`-recommended`/`-fonts-recommended` |
-| `_includes/cv-live.html` | `pandoc` | `pandoc/core:3.11` |
+| `apt-get install texlive` per run (original) | — | **29.7 s** |
+| Prebuilt image, apt layers baked | ~45 s | 2.0 s |
+| Prebuilt + fonts baked in | ~45 s | **0.75 s** (both artifacts) |
 
-Nothing is written as `:latest`, so a toolchain release cannot silently rewrite
-the committed artifacts.
+The remaining 2.0 s→0.75 s gap is the font warm-up. `cv/Dockerfile` compiles
+`cv/warmup.tex` at build time so the EC/LModern PK fonts already exist; without
+it, `pdflatex` regenerates ~8 fonts per run via `mktexpk`.
+
+Two traps in that warm-up, both of which silently degrade it to a no-op:
+
+1. **It must match `cv.tex`'s class options.** `cv.tex` is `[11pt,letterpaper]`,
+   so `\normalsize` is 10.95pt (`ecrm1095`). A bare `\documentclass{article}` is
+   10pt, which bakes 1000-series fonts and leaves the 1095-series to be generated
+   anyway. If `cv.tex`'s base size or `fontenc` changes, update `warmup.tex`.
+2. **`\usefont` takes NFSS family names, not EC file names.** Use `cmr`/`cmss`/
+   `cmtt`; `ecrm`/`ecss` select nothing and bake no fonts.
+
+The warm-up now sweeps every family at every size the class produces, plus the
+TS1 encoding (which supplies `\textbullet`, used on the contact line, and is
+reached through a different encoding entirely), so it does not go stale when a
+new heading style is added. Verify with:
+
+```bash
+docker run --rm -v "$PWD":/work -w /work "$(./cv/build.sh --print-image-tag)" bash -c '
+  cd /tmp && cp /work/cv/cv.tex .
+  pdflatex -interaction=nonstopmode cv.tex 2>&1 | grep -c mktexpk'   # want: 0
+```
 
 ### Why the artifacts are committed, even though they are generated
 
@@ -61,22 +133,29 @@ CI regenerates both before building, so what ships is never stale. See §3.
 
 ### The exact commands the script runs
 
+Both steps run inside the toolchain image. The flags that matter are annotated;
+see §6 for the ones that look wrong but are not.
+
 ```bash
-# HTML view — note `latex-auto_identifiers`, which is pandoc's LaTeX reader with
-# auto-ids DISABLED (see the gotcha in §6).
+TAG="$(./cv/build.sh --print-image-tag)"
+
+# HTML view
+#   latex-auto_identifiers disables pandoc's auto-ids (see the gotcha in §6)
+#   --user + HOME=/tmp stop the container writing as root
+#   HOME=/tmp is SAFE here because pandoc keeps no font cache
 docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/work -w /work \
-  -e HOME=/tmp pandoc/core:3.11 \
-  cv/cv.tex -f latex-auto_identifiers -t html5 --wrap=none \
+  -e HOME=/tmp "$TAG" \
+  pandoc cv/cv.tex -f latex-auto_identifiers -t html5 --wrap=none \
   --shift-heading-level-by=1
 
 # PDF
-docker run --rm -v "$PWD":/work -e HUID="$(id -u)" -e HGID="$(id -g)" \
-  ubuntu:24.04 bash -c '
-    apt-get update -qq
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
-      texlive-latex-base texlive-latex-recommended texlive-fonts-recommended
+#   deliberately NO -e HOME: the baked fonts live under root's HOME, and
+#   overriding it makes TeX regenerate every font (see §1.3)
+docker run --rm -v "$PWD":/work -w /work \
+  -e HUID="$(id -u)" -e HGID="$(id -g)" "$TAG" bash -c '
+    set -e
     cd /tmp && cp /work/cv/cv.tex .
-    pdflatex -interaction=nonstopmode -halt-on-error cv.tex
+    pdflatex -interaction=nonstopmode -halt-on-error cv.tex >/dev/null
     cp cv.pdf /work/assets/pdf/Alden_CV.pdf
     chown "$HUID:$HGID" /work/assets/pdf/Alden_CV.pdf
   '
@@ -87,8 +166,15 @@ docker run --rm -v "$PWD":/work -e HUID="$(id -u)" -e HGID="$(id -g)" \
 > generated files land root-owned, and the next build fails with
 > *Permission denied* — which looks like a script bug but is a file-ownership
 > problem. Both were hit and fixed during development.
+>
+> **The `HOME` asymmetry is also load-bearing.** The HTML step sets `HOME=/tmp`
+> (needed for `--user` to have a writable home); the PDF step must **not**,
+> because the image's baked fonts live under `/root/.texlive2023/`. Passing
+> `HOME=/tmp` to the PDF step moves `TEXMFVAR` and defeats the font warm-up.
 
 ### Native build (if you already have a TeX distribution)
+
+`./cv/build.sh --host` uses host binaries directly. Equivalently, by hand:
 
 ```bash
 pdflatex -interaction=nonstopmode -halt-on-error \
@@ -97,7 +183,13 @@ cp cv/cv.pdf assets/pdf/Alden_CV.pdf
 rm -f cv/cv.aux cv/cv.log cv/cv.out   # never commit these
 ```
 
-This does **not** regenerate the HTML view — that always needs pandoc.
+This does **not** regenerate the HTML view — that always needs pandoc. You can
+also get pandoc without Docker: the official Linux build is **statically linked**,
+so it runs anywhere with no dependencies. Download
+`pandoc-3.11-linux-amd64.tar.gz` (or `-arm64`) from the
+[pandoc releases](https://github.com/jgm/pandoc/releases/tag/3.11) —
+`cv/build.sh` will fetch and cache that same binary itself if you run `--host`
+without pandoc installed.
 
 ## 2. Verify before pushing
 
@@ -249,15 +341,36 @@ sha256sum assets/pdf/Alden_CV.pdf | cut -c1-16   # must match
 
 ## 5. ⚠️ Verify the text layer — the PDF is read by machines, not just people
 
-This is the step that is easy to skip and expensive to get wrong. T1 (EC/
-LModern) encoding makes pdfTeX render `fi`/`fl` as single ligature glyphs with
-no text equivalent, so **"file" extracts as "le"** and "profile" as "prole".
-Every ATS and every copy-paste sees the mangled text. `cv.tex` prevents this
-with `\usepackage{microtype}` + `\DisableLigatures{encoding = T1, family = *}`.
+This is the step that is easy to skip and expensive to get wrong. There are
+**two** distinct ways the text layer breaks, and they have different signatures.
+
+**Failure 1 — pdfTeX ligature glyphs.** T1 (EC/LModern) encoding makes pdfTeX
+render `fi`/`fl` as single ligature glyphs with no text equivalent, so **"file"
+extracts as "le"** and "profile" as "prole". Every ATS and every copy-paste sees
+the mangled text. `cv.tex` prevents this with `\usepackage{microtype}` +
+`\DisableLigatures{encoding = T1, family = *}`.
 
 ```bash
 pdftotext assets/pdf/Alden_CV.pdf - | grep -i "prole le"   # must print NOTHING
 ```
+
+**Failure 2 — Unicode ligature codepoints.** An XeTeX-based engine (e.g.
+Tectonic) does not produce failure 1 at all. Instead it emits the Unicode
+ligature codepoints **U+FB00–U+FB04**, so "file" extracts as **`ﬁle`** — equally
+broken for an ATS, but the `prole le` check **passes**, because that signature
+never appears. This was measured, not theorised: a XeTeX build of `cv.tex` gives
+0 occurrences of plain `fi` and 2 of U+FB01.
+
+```bash
+pdftotext assets/pdf/Alden_CV.pdf - | LC_ALL=C grep -qF "$(printf '\xef\xac')" \
+  && echo BROKEN      # all five Latin ligatures start with bytes EF AC
+```
+
+**`cv/build.sh` now runs both checks automatically** after every PDF build, using
+a local `pdftotext` if present or the one baked into the toolchain image if not
+(GitHub's runners ship no poppler). A build that produces either signature fails
+loudly. This matters because a non-pdfTeX engine is otherwise perfectly capable
+of shipping a broken text layer behind a green build.
 
 Measured alternatives, so this isn't re-litigated (see the comment in `cv.tex`):
 
@@ -265,7 +378,8 @@ Measured alternatives, so this isn't re-litigated (see the comment in `cv.tex`):
 |---|---|---|
 | T1 + `\pdfgentounicode` + `glyphtounicode` | ❌ still `prole le` | ✅ correct |
 | Default OT1 (drop `fontenc`) | ✅ correct | ❌ `Universite ́ naı̈ve` |
-| **T1 + microtype `\DisableLigatures`** | ✅ correct | ✅ correct |
+| **T1 + microtype `\DisableLigatures` (pdfTeX)** | ✅ correct | ✅ correct |
+| Tectonic / XeTeX | ❌ `ﬁle` (U+FB01) | ✅ correct |
 
 `cv.tex` therefore loads microtype as `\usepackage[expansion=false]{microtype}`.
 Do **not** simply drop the option: microtype's font expansion needs scalable
@@ -273,6 +387,13 @@ fonts, and on a minimal TeX install the T1 fonts are bitmap-only, so pdfTeX
 aborts with *"auto expansion is only possible with scalable fonts"* and emits
 no PDF at all. Enabling expansion would require adding a scalable font package
 (`lmodern`/`cmsuper`, i.e. `texlive-fonts-extra`).
+
+> **Why not Tectonic?** It is an appealing Docker-free option — one self-contained
+> binary, no TeX install. It was tested and rejected: it is XeTeX-based, so
+> `\DisableLigatures` hard-errors (*"only possible with pdftex version 1.30 or
+> newer"*), it produces a different PDF entirely, and it breaks the text layer in
+> the way failure 2 describes. Adopting it would mean a different document, not a
+> faster build of this one.
 
 Also confirm the file is a real PDF and not a stub:
 
@@ -325,6 +446,21 @@ Both `--user "$(id -u):$(id -g)"` (pandoc) and `chown "$HUID:$HGID"` (TeX) in
 `build.sh` exist for this. Miss either and the generated file is root-owned, the
 next build fails with *Permission denied*, and it reads like a script bug.
 
+### The font warm-up fails silently if `warmup.tex` drifts from `cv.tex`
+
+If `cv.tex` changes its base point size or encoding, `cv/warmup.tex` will bake
+fonts that are never used and leave the real ones to be generated at run time —
+a slowdown, not an error, so nothing complains. Check with the `mktexpk` count in
+§1.3. Two specific traps: the class options must match (`11pt` in both), and
+`\usefont` takes NFSS names (`cmr`), not EC file names (`ecrm`).
+
+### Do not compare a Docker image tag by hand
+
+`cv/build.sh` derives the tag from a hash of `cv/Dockerfile` + `cv/warmup.tex`.
+Hardcoding a different tag anywhere (e.g. in the workflow) means the script won't
+find the cached image and will rebuild it from scratch, silently wasting the
+cache. Ask the script instead: `./cv/build.sh --print-image-tag`.
+
 ### `sass: style: compressed` in `_config.yml` looks redundant — it is not
 
 Native Pages renders through the `github-pages` gem, which injects
@@ -370,19 +506,21 @@ lines of setup — and `enumitem` is not needed for correct rendering.
 |---|---|---|
 | `cv/cv.tex` | ✅ | The source of truth for the CV document |
 | `cv/build.sh` | ✅ | One build path, shared by humans and CI |
-| `.github/workflows/deploy.yml` | ✅ | Runs `cv/build.sh`, then builds and deploys the site |
+| `cv/Dockerfile` | ✅ | The pinned toolchain; its content hashes into the image tag |
+| `cv/warmup.tex` | ✅ | Build-time font warm-up only — never compiled into an artifact |
+| `.github/workflows/deploy.yml` | ✅ | Caches the image, runs `cv/build.sh`, builds and deploys the site |
 | `assets/pdf/Alden_CV.pdf` | ✅ | Pages cannot compile it, so the bytes must ship |
 | `_includes/cv-live.html` | ✅ | Generated, but Jekyll's `include` raises `IOError` if it is absent |
-| `cv/cv.aux`, `cv/cv.log`, `cv/cv.out` | ❌ | LaTeX intermediates; delete them |
-| `cv/*.pdf` (build scratch) | ❌ | Only `assets/pdf/Alden_CV.pdf` ships |
-| `cv/` (the whole directory) | ❌ served | Excluded in `_config.yml` — Jekyll must not copy `.tex` into `_site` |
+| `cv/cv.aux`, `cv/cv.log`, `cv/cv.out` | ❌ | LaTeX intermediates; the script compiles out-of-tree so they never appear |
+| `cv/warmup.pdf`, `cv/*.pdf` (scratch) | ❌ | Build scratch; only `assets/pdf/Alden_CV.pdf` ships |
+| `cv/` (the whole directory) | ❌ served | Excluded in `_config.yml` — Jekyll must not copy `.tex`/`Dockerfile` into `_site` |
 
 ## 9. Content discipline
 
 Both artifacts are generated, never hand-edited, and this stub is not a licence
-to invent history. Replace placeholders from the real master CV only (handoff
-open question #4) — the same rule that keeps `_projects/` and `_research/`
-entries at `published: false` until real content is parsed.
+to invent history. Replace placeholders from the real master CV only — the same
+rule that keeps `_projects/` and `_research/` entries at `published: false`
+until real content is parsed.
 
 When the real CV lands: replace the body of `cv.tex`, delete the
 `Placeholder document.` notice and the `\ph{}` markers, run `./cv/build.sh`, and
