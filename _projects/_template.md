@@ -15,7 +15,7 @@ tech_stack: []
 flagship: false
 summary: >
   One or two sentence plain-language description.
-metrics: []                 # only real, checkable numbers — else omit
+metrics: []                 # headline results stated on the master CV; [] if none
 notes_missing_data: false   # true when quantified results were not recoverable
 ---
 

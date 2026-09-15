@@ -1,27 +1,49 @@
 {% comment %}
   One CV timeline row (education / research / project). Parameters:
-    title (required) — entry or degree name
-    org    — institution or research group (optional)
-    dates  — raw date or date_end (optional; formatted here)
-    url    — detail page link (optional)
-    summary— one-line summary (optional)
+
+    title  (required) entry or degree name
+    org    institution or research group (optional)
+    start  date_start, a date or null (optional)
+    end    date_end, a date or null; null means ongoing (optional)
+    dates  a plain string, for when there is no start/end pair, e.g. education's
+           "December 2026" (optional)
+    url    detail page link (optional)
+    summary  one-line summary (optional)
+
+  Renders "Aug 2026 - present" for a range, "May 2026" when only one end is
+  known, or the given string.
+
+  Two things to know before editing this file:
+
+  1. Pass `start` and `end` separately. An earlier version took only `date_end`,
+     so every row showed a single month with no range, even though the CV states
+     a range for most entries.
+
+  2. Do NOT test for a date by checking whether it contains a hyphen. Liquid
+     stringifies whatever it is handed, and a date renders as "2026-05-01",
+     which contains a hyphen, so such a test is always true and any else-branch
+     is dead code. Test for nil explicitly instead (see the branches above).
+
+     Note when editing this comment: Liquid strips comment bodies but still
+     TOKENISES them, so a literal tag written here as an example is parsed as a
+     real tag and breaks the file. That is why the previous wording described the
+     pattern in words instead of showing it.
 {% endcomment %}
 <div class="timeline-entry">
   <div class="timeline-entry__head">
     <span class="timeline-entry__title">
       {% if include.url %}<a href="{{ include.url | relative_url }}">{{ include.title }}</a>{% else %}{{ include.title }}{% endif %}
     </span>
-    {% if include.dates %}
-      <span class="timeline-entry__dates">
-        {% assign d = include.dates %}
-        {% if d contains "-" %}
-          {{ d | date: "%b %Y" }}
-        {% else %}
-          {% comment %}education expected_graduation: date or string{% endcomment %}
-          {{ d | date: "%b %Y" | default: d }}
-        {% endif %}
-      </span>
-    {% endif %}
+    <span class="timeline-entry__dates">
+      {%- if include.start -%}
+        {{ include.start | date: "%b %Y" }} &ndash;
+        {%- if include.end %} {{ include.end | date: "%b %Y" }}{% else %} present{% endif %}
+      {%- elsif include.end -%}
+        {{ include.end | date: "%b %Y" }}
+      {%- elsif include.dates -%}
+        {{ include.dates }}
+      {%- endif -%}
+    </span>
   </div>
   {% if include.org %}<div class="timeline-entry__org">{{ include.org }}</div>{% endif %}
   {% if include.summary %}<div class="timeline-entry__summary">{{ include.summary }}</div>{% endif %}

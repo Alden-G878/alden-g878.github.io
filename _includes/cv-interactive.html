@@ -77,12 +77,28 @@
   <h2>Experience</h2>
   {% assign cv_projects = site.projects %}
   {% assign cv_research = site.research %}
-  {% assign timeline = cv_projects | concat: cv_research | sort: "date_end" | reverse %}
+  {% comment %}
+    Ongoing entries first, then the rest newest-first.
+  
+    Note: sorting by date_end and reversing does NOT put ongoing
+    entries first, despite what this file used to claim. Liquid's
+    ascending sort treats nil as greatest, so reversing leaves the
+    nulls at the END. Verified in a scratch site:
+    a(2024-06) d(2023-06) c() b() -> the nulls sort last.
+  
+    The split below is explicit instead. Ongoing work is the most
+    relevant thing on a CV, so it leads.
+  {% endcomment %}
+  {% assign all_entries = cv_projects | concat: cv_research %}
+  {% assign ongoing = all_entries | where_exp: "e", "e.date_end == nil" %}
+  {% assign dated = all_entries | where_exp: "e", "e.date_end != nil" %}
+  {% assign timeline = ongoing | concat: dated %}
   {% for entry in timeline %}
     {% include timeline-entry.html
          title=entry.title
          org=entry.group
-         dates=entry.date_end
+         start=entry.date_start
+         end=entry.date_end
          url=entry.url
          summary=entry.summary %}
     {% unless entry.group %}

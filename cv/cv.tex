@@ -31,7 +31,7 @@
 %      for ATS matching and avoids PDFDocEncoding surprises in metadata.
 % ===========================================================================
 
-\documentclass[11pt,letterpaper]{article}
+\documentclass[10pt,letterpaper]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -47,7 +47,7 @@
 % fonts baked into the toolchain image (cv/warmup.tex) and costing ~1.5s of
 % mktexpk on the first run after each change. Widening the text block instead
 % keeps the line height and the baked fonts untouched.
-\usepackage[margin=0.5in]{geometry}
+\usepackage[margin=0.3in]{geometry}
 % Times (PSNFSS), matching the master CV. Also narrower than Computer
 % Modern, which recovers roughly a page of length. times.sty is in the
 % PSNFSS bundle already present in texlive-latex-recommended.
@@ -105,12 +105,17 @@
 % separated by \vspace, a large parskip compounds and costs pages.
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt}
+\emergencystretch=2em
+% Never hyphenate: a hyphenated line-break word splits in the extracted text
+% layer, and an ATS doing literal token matching misses the fragment.
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
 
 % Slightly tighter line spacing than the 11pt default (13.6pt). The master CV
 % runs ~13.2pt; 12.8pt keeps it legible while recovering vertical space.
 % \linespread scales leading only, so no new font sizes are introduced and the
 % toolchain image's baked fonts stay valid (see the geometry note above).
-\linespread{0.94}
+\linespread{0.88}
 
 % --- PDF document metadata (ATS / recruiter tooling) -------------------------
 % Application tracking systems and recruiter tools read the PDF's document
@@ -136,14 +141,15 @@
 % and pandoc's LaTeX reader still sees ordinary itemize blocks).
 \newcommand{\tightlist}{%
   \setlength{\itemsep}{0pt}%
+  \setlength{\leftmargin}{1.35em}%
   \setlength{\parskip}{0pt}%
-  \setlength{\topsep}{1pt}%
+  \setlength{\topsep}{0pt}%
   \setlength{\parsep}{0pt}%
 }
 
 % Separator between CV entries. A macro rather than a literal \vspace so the
 % spacing is uniform and adjustable in one place.
-\newcommand{\entrysep}{\vspace{2pt}}
+\newcommand{\entrysep}{\vspace{0pt}}
 
 % --- Section heading spacing -------------------------------------------------
 % \section*{} is used throughout: no "1 2 3" numbering, which a CV does not
@@ -180,9 +186,9 @@
 % 3 pages, matching the master CV it mirrors. Do not tighten further without
 % re-checking legibility — the aim is a readable CV, not a short one.
 \newcommand{\cvsection}[1]{%
-  \vspace*{-12pt}%
+  \vspace*{-20pt}%
   \section*{#1}%
-  \vspace*{-6pt}%
+  \vspace*{-9pt}%
 }
 
 % --- Date / meta span ------------------------------------------------------
@@ -206,6 +212,7 @@
 \pagestyle{empty}
 
 \begin{document}
+\pdfinterwordspaceon
 
 % ---- Header ---------------------------------------------------------------
 % Contact details are written as PLAIN TEXT, separated by \textbullet, rather
@@ -218,7 +225,7 @@
 %
 % The website and GitHub ARE linked, since a URL is both a link and literal text.
 \begin{center}
-  {\Large\bfseries Alden Grover}\\[4pt]
+  {\Large\bfseries Alden Grover}\\[2pt]
   Pittsburgh, PA \textbullet\ aldengrover@gmail.com \textbullet\ 646-539-8055\\
   \href{https://alden-g878.github.io}{alden-g878.github.io}
   \textbullet\

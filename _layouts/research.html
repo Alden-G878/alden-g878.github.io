@@ -41,6 +41,22 @@ layout: default
     <p class="project-summary" itemprop="description">{{ page.summary }}</p>
   {% endif %}
 
+  {% comment %}
+    Headline results, mirroring project.html. Rendered only when real quantified
+    results exist — populated from the master CV, never estimated. Entries with
+    no figures on the CV simply omit the key and this section does not appear.
+  {% endcomment %}
+  {% if page.metrics and page.metrics.size > 0 %}
+    <section class="project-metrics">
+      <h2>Results</h2>
+      <ul>
+        {% for m in page.metrics %}
+          <li>{{ m }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
   {{ content }}
 
   {% comment %}

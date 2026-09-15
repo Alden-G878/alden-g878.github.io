@@ -14,6 +14,7 @@ publication_status: none    # none | in-preparation | submitted | published
 flagship: false
 summary: >
   One or two sentence plain-language description.
+metrics: []                 # headline results stated on the master CV; [] if none
 ---
 
 Full write-up here. Populate from the master CV.
