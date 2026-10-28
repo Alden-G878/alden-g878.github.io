@@ -43,6 +43,7 @@
 
 "Clocking and Custom Circuits":
   - "PLLs"
+  - "All-digital PLL (ADPLL)"
   - "Ring oscillators"
   - "Digitally controlled delay lines (DCDL)"
   - "Standard-cell library design"
