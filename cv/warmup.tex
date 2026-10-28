@@ -21,11 +21,13 @@
 % that are never used and leaves the real ones to be generated at run time, so
 % the warm-up silently does nothing.
 %
-% Note the current cv.tex loads `times` (PSNFSS), so it is typeset entirely in
-% scalable Type1 Times/Nimbus fonts and generates NO bitmap fonts at run time
-% (measured: 0 mktexpk). The sweep below is therefore inert for this document
-% today; it is kept for the case where cv.tex's font setup changes. If the class
-% options or fontencoding change, update this file to match.
+% Note the current cv.tex loads `charter` + `helvet` (PSNFSS), so it is typeset
+% entirely in scalable Type1 Charter and Helvetica/Nimbus fonts and generates NO
+% bitmap fonts at run time (measured: 0 mktexpk). The sweep below is therefore
+% inert for this document today; it is kept for the case where cv.tex's font
+% setup changes. If the class options or fontencoding change, update this file to
+% match. Note the serif package matters twice over: dropping `helvet` lets the
+% T1 Computer Modern sans through, which is bitmap-only here (see cv.tex).
 
 \documentclass[10pt,letterpaper]{article}
 

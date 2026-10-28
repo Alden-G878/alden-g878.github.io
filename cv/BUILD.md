@@ -88,10 +88,10 @@ on every CI push, since GitHub-hosted runners have no Docker layer cache.
 
 `cv/Dockerfile` also compiles `cv/warmup.tex` at build time to pre-bake the
 EC/LModern bitmap fonts. **This is inert for the current CV:** `cv.tex` loads
-`times` (PSNFSS), so the document is typeset in the scalable Type1 Times/Nimbus
-fonts and pdfTeX generates no `mktexpk` fonts at all on a build (measured: 0).
-The warm-up is kept only for the case where the font setup changes; it is a
-performance hint, not a correctness dependency.
+`charter` + `helvet` (PSNFSS), so the document is typeset in the scalable Type1
+Charter and Helvetica/Nimbus fonts and pdfTeX generates no `mktexpk` fonts at all
+on a build (measured: 0). The warm-up is kept only for the case where the font
+setup changes; it is a performance hint, not a correctness dependency.
 
 Two traps in that warm-up, both of which silently degrade it to a no-op:
 

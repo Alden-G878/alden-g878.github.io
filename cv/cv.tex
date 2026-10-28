@@ -62,10 +62,22 @@
 % mktexpk on the first run after each change. Widening the text block instead
 % keeps the line height and the baked fonts untouched.
 \usepackage[margin=0.5in]{geometry}
-% Times (PSNFSS), matching the master CV. Also narrower than Computer
-% Modern, which recovers roughly a page of length. times.sty is in the
-% PSNFSS bundle already present in texlive-latex-recommended.
-\usepackage{times}
+% Charter (Bitstream Charter, PSNFSS bch), not Times. Charter's x-height is
+% 0.482em against Times' 0.450em, so at this 10pt base it reads ~7% larger
+% without a single extra page — the cheapest legibility gain available, since
+% 10pt Times is the smallest-looking type in the toolchain image. Charter was
+% drawn to hold up at low resolution, which is also the case here (screen and
+% print at 10pt).
+%
+% The `helvet` line is NOT decorative: charter.sty resets \sfdefault away from
+% the Helvetica that times.sty used to supply, and the T1 Computer Modern sans
+% then has no scalable face in this image — headings silently become a Type 3
+% font with no Unicode map (pdffonts shows "F43", uni=no), which is exactly what
+% the text-layer rules below exist to prevent. Loading Helvetica keeps every
+% font Type 1 and Unicode-mapped. If you swap the serif package again, check
+% `pdffonts assets/pdf/Alden_CV.pdf` for a Type 3 entry before committing.
+\usepackage{charter}
+\usepackage{helvet}
 \usepackage[hidelinks]{hyperref}
 
 % --- ATS / copy-paste text layer --------------------------------------------
