@@ -18,7 +18,7 @@ flagship: false
 summary: >
   Hardware threads implementing the K Nearest Neighbor algorithm in a heavily pipelined design, exceeding a 300 MHz timing requirement.
 metrics:
-  - "Exceeded the 300 MHz timing requirement"
+  - "Exceeded the 300 MHz timing requirement (PDK specified by 18-340)"
 notes_missing_data: false
 ---
 
@@ -26,4 +26,4 @@ notes_missing_data: false
 
 - Heavily pipelined design and Manhattan distance calculation maximized clock frequency
 
-- Exceeded 300 MHz timing requirement
+- Exceeded the 300 MHz timing requirement (PDK specified by 18-340)

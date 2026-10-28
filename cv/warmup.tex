@@ -1,8 +1,10 @@
 % Build-time font warm-up — NOT part of the CV. Never compiled into an artifact.
 %
 % cv/Dockerfile compiles this once so the EC/LModern fonts and LaTeX format
-% files are baked into the toolchain image. That turns the per-run cost of the
-% PDF from ~2.0 s (regenerating fonts via mktexpk every time) into ~0.44 s.
+% files are baked into the toolchain image. With the document's current Times
+% (Type1, scalable) font setup pdfTeX generates no bitmap fonts per run
+% (measured: 0 mktexpk), so this warm-up is inert for the current CV — see the
+% note below.
 %
 % The preamble deliberately mirrors cv/cv.tex's essentials, because the point is
 % to prime the same engine configuration and font encoding. The body then uses
@@ -13,19 +15,19 @@
 % the first run will regenerate just that font (~1.5 s, once) — the build still
 % succeeds, so this file is a performance hint, not a correctness dependency.
 
-% The preamble and class options MUST mirror cv/cv.tex exactly, because EC font
-% sizes are derived from the document's base point size. A bare \documentclass
-% {article} is 10pt, so \normalsize is ecrm1000 — but cv.tex is 11pt, where
-% \normalsize is 10.95pt (ecrm1095). Warming up 1000-series fonts against an
-% 11pt document bakes 16 fonts that are never used and leaves the 8 that ARE
-% used to be generated at run time, so the warm-up silently does nothing.
-% (Measured: the real CV generated ecrm1095, ecbx1095, ecbi1095, ecti1095,
-% ecsi1095, ectt1095, tcrm1095, ecbx1440 on every run.)
+% The preamble and class options MUST mirror cv/cv.tex exactly, because font
+% sizes are derived from the document's base point size. cv.tex is 10pt, so
+% \normalsize is ecrm1000. Warming fonts for the wrong base size bakes files
+% that are never used and leaves the real ones to be generated at run time, so
+% the warm-up silently does nothing.
 %
-% If cv.tex's class options or fontencoding change, update this file to match or
-% the warm-up becomes a no-op again.
+% Note the current cv.tex loads `times` (PSNFSS), so it is typeset entirely in
+% scalable Type1 Times/Nimbus fonts and generates NO bitmap fonts at run time
+% (measured: 0 mktexpk). The sweep below is therefore inert for this document
+% today; it is kept for the case where cv.tex's font setup changes. If the class
+% options or fontencoding change, update this file to match.
 
-\documentclass[11pt,letterpaper]{article}
+\documentclass[10pt,letterpaper]{article}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}

@@ -45,7 +45,7 @@ roles:
       Supported students with hardware debugging and design questions in the
       same course.
 
-  - title: "Electronics Head"
+  - title: "Electronics Master"
     org: "Robotics Club"
     start: 2025-08-01
     end: null # null = ongoing

@@ -17,14 +17,11 @@ tech_stack:
 publication_status: none
 flagship: false
 summary: >
-  A nanopositioning system for lithography and Van der Waals heterostructure construction, improving resolution by an order of magnitude.
+  A nanopositioning system for lithography and Van der Waals heterostructure construction, improving resolution from 10µm to 400nm.
 metrics:
-  - "Nanopositioning resolution improved by an order of magnitude"
-  - "Positioning uncertainty reduced to below 400nm"
+  - "Nanopositioning resolution improved from 10µm to 400nm"
 ---
 
-- Improved high-accuracy nanopositioning system resolution by an order of magnitude
-
-- Led a team that reduced the uncertainty in the positioning system to below 400nm
+- Led a team that improved high-accuracy nanopositioning system resolution from 10µm to 400nm
 
 - Technologies: Embedded C++, CAD and CAM, piezoelectric nanopositioning

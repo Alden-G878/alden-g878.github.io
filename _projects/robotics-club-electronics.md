@@ -10,7 +10,7 @@
 # Related but distinct from _projects/robobuggy-firmware.md: Robobuggy is a
 # subteam, this is the club. Do not merge the two, and do not duplicate the
 # Robobuggy bullet points here.
-title: "Electronics Head, Robotics Club"
+title: "Electronics Master, Robotics Club"
 published: true
 date_start: 2025-08-01
 date_end: null # null = ongoing

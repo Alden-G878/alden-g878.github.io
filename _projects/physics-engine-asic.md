@@ -28,7 +28,7 @@ metrics:
 notes_missing_data: false
 ---
 
-- Tape out: Sky130 open source PDK; Fab: TinyTapeout
+- Tape out: Sky130 open-source PDK (SkyWater 130nm), via the TinyTapeout shuttle
 
 - Implemented a falling sand simulation with output over VGA
 

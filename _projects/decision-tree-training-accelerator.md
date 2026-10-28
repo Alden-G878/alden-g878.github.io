@@ -24,7 +24,7 @@ notes_missing_data: false
 
 - Designed a series of hardware threads that accelerated decision tree machine learning algorithm training
 
-- Calculated Gini score using custom designed multiplication and division hardware threads
+- Calculated Gini score using custom multiplication hardware
 
 - Leveraged arithmetic properties of numerical representation to bypass expensive computations
 

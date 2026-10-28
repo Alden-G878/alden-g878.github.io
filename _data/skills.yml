@@ -11,9 +11,9 @@
   - "ASIC RTL design and tape out"
   - "FPGA design"
   - "TinyTapeout"
-  - "Networks on a chip"
+  - "Network-on-chip (NoC) design"
   - "USB 2.0 hardware"
-  - "Finite state machines for datapath control"
+  - "Finite state machines (FSMs) for datapath control"
   - "VGA waveform generation"
 
 "Verification":
@@ -21,29 +21,42 @@
   - "Cocotb"
   - "RTL waveform debug"
   - "Formal reachability proofs for FSMs"
-  - "Static Timing Analysis"
-  - "Constrained Random Testing"
+  - "Static Timing Analysis (STA)"
+  - "Constrained random testing"
 
-"EDA":
+"EDA and Flow":
   - "Cadence Virtuoso"
+  - "Cadence synthesis and simulation"
+  - "Yosys"
+  - "SPICE"
+  - "RTL-to-GDSII flow (netlist, place and route, GDSII)"
   - "TSMC 28nm planar PDK"
   - "Sky130 PDK"
   - "Generic 45nm planar PDK"
   - "KiCad"
 
 "Computer Architecture":
-  - "RV32I/M ISA and microcode"
+  - "RISC-V (RV32I/M) ISA and microcode"
   - "Pipelining"
   - "Branch prediction"
   - "Cache management and bus snooping"
+
+"Clocking and Custom Circuits":
+  - "PLLs"
+  - "Ring oscillators"
+  - "Digitally controlled delay lines (DCDL)"
+  - "Standard-cell library design"
+  - "PPA (power, performance, area) optimization"
 
 "Embedded Systems":
   - "Embedded C++"
   - "RTOS development"
   - "Bootloader design"
+  - "UART/USART and QSPI"
   - "Custom serial protocols"
   - "Hard real-time systems"
   - "Memory-mapped peripheral firmware development"
+  - "Sensor fusion (Kalman filter)"
 
 "Hardware Acceleration":
   - "Systolic arrays"

@@ -40,9 +40,10 @@
 \usepackage[utf8]{inputenc}
 
 % Margins and leading are measured against the master CV, not guessed. The
-% master uses ~0.5in margins and ~13.2pt leading; matching both here puts the
-% same content in 3 pages at the same density, so this PDF and the master CV
-% read the same.
+% master uses ~0.5in margins and ~13.2pt leading, and both are matched here, so
+% this PDF reads at the same density as the master CV. That density no longer
+% packs into 3 pages once entries are kept whole across page breaks — see the
+% entry keep-together note below and the page-count note in BUILD.md §2.
 %
 % Rendering this content with the default 1in margins needed 5 pages — a real
 % readability regression, since the master CV is the format recruiters already
@@ -126,7 +127,7 @@
 
 % Leading matched to the master CV. The 10pt base size has a 12pt default
 % baselineskip, so 1.10 gives 13.2pt — the master CV measures 13.1pt at the
-% same base size, i.e. the two now agree. (This file was 0.86 = 10.3pt, which
+% same base size, i.e. the two agree. (This file was once 0.86 = 10.3pt, which
 % looked cramped next to the master.)
 %
 % \linespread scales leading only, so no new font sizes are introduced and the
@@ -163,9 +164,40 @@
   \setlength{\parsep}{0pt}%
 }
 
-% Separator between CV entries. A macro rather than a literal \vspace so the
-% spacing is uniform and adjustable in one place.
-\newcommand{\entrysep}{\vspace{2pt}}
+% --- Keeping entries whole across page breaks -------------------------------
+% No entry may straddle a page break. The toolchain image carries only
+% texlive-latex-base + -recommended, so \needspace is unavailable; this is a
+% package-free stand-in. Called before each entry, it breaks first when fewer
+% than #1 of vertical space remain, so any entry shorter than #1 is never split.
+%
+% #1 must be ≥ the tallest entry or a taller one can still straddle a break; the
+% longest entry here (Physics Engine ASIC, title + 9 bullets) is ~136pt, so 140pt
+% covers every entry. An absolute length is required because \baselineskip is 0
+% in vertical mode, where \entrysep runs.
+%
+% A penalty-based alternative — wrapping each entry so no breakpoint exists
+% inside it — was tried and rejected: with no legal breakpoint TeX produced an
+% overfull \vbox and silently pushed ~30 lines off the last page. Never trade a
+% split for lost content.
+%
+% Budget: this can leave up to ~#1 free at a page bottom, so the CV runs 4 pages
+% rather than 3 at the master density. Accepted — this CV is not length-bound,
+% and a split entry is the worse defect.
+\newlength{\cvkeepskip}
+\newcommand{\cvkeep}[1]{%
+  \begingroup
+    \setlength{\cvkeepskip}{#1}%
+    \ifdim\pagegoal<\maxdimen
+      \addtolength{\cvkeepskip}{\pagetotal}%
+      \ifdim\cvkeepskip>\pagegoal
+        \newpage
+      \fi
+    \fi
+  \endgroup
+}
+
+% Separator between CV entries: uniform gap plus the keep-together guard.
+\newcommand{\entrysep}{\vspace{2pt}\cvkeep{140pt}}
 
 % --- Section heading spacing -------------------------------------------------
 % \section*{} is used throughout: no "1 2 3" numbering, which a CV does not
@@ -198,9 +230,9 @@
 % form applies unconditionally. Measured: 26pt of space around each heading
 % with the plain form, versus the intended tighter spacing with the starred one.
 %
-% The values below are the LEAST aggressive of the settings that fit the CV in
-% 2 pages (the master CV it mirrors runs 3). Do not tighten further without
-% re-checking legibility — the aim is a readable CV, not a short one.
+% The values below are the least aggressive that still look deliberate rather
+% than cramped. Do not tighten further without re-checking legibility — the aim
+% is a readable CV, not a short one.
 \newcommand{\cvsection}[1]{%
   \vspace*{-11pt}%
   \section*{#1}%
@@ -250,9 +282,9 @@
 
 % ---- Summary --------------------------------------------------------------
 \cvsection{Summary}
-Seeking spring/summer 2027 internships in digital circuit and RTL design and
-research. BS/MS combined student with Ph.D. intent, open to industry roles
-between degrees.
+Seeking spring/summer 2027 internships in digital circuit and RTL design,
+verification, and research. BS/MS combined student with Ph.D. intent, open to
+industry roles between degrees.
 
 % ---- Education ------------------------------------------------------------
 \cvsection{Education}
@@ -264,6 +296,7 @@ between degrees.
 BS in Electrical and Computer Engineering, expected graduation December 2026 \\
 Expected MS in Electrical and Computer Engineering (combined MS/BS program),
 graduating 2028, with Ph.D. intent \\
+\textbf{Honors:} College of Engineering Dean's List (Spring 2024) \\
 \textbf{Notable Classwork:} 18-447: Introduction to Computer Architecture, 18-320: Microelectronic Circuits, 18-340: Hardware Arithmetic
     for Machine Learning, 18-349: Introduction to Embedded Systems
 
@@ -271,18 +304,24 @@ graduating 2028, with Ph.D. intent \\
 \cvsection{Technical Skills}
 \begin{itemize}\tightlist
   \item \textbf{RTL Design:} SystemVerilog, Verilog, ASIC RTL design and tape
-    out, FPGA design, TinyTapeout, networks on a chip, USB 2.0 hardware, finite
-    state machines for datapath control, VGA waveform generation
+    out, FPGA design, TinyTapeout, network-on-chip (NoC) design, USB 2.0
+    hardware, finite state machines (FSMs) for datapath control, VGA waveform
+    generation
   \item \textbf{RTL Verification and Simulation:} SystemVerilog testbenches,
-    Cocotb, RTL waveform debug, formal reachability proofs for FSMs, Static
-    Timing Analysis, Constrained Random Testing
-  \item \textbf{EDA:} Cadence Virtuoso, TSMC 28nm planar PDK, Sky130 PDK,
-    Generic 45nm planar PDK, KiCad
-  \item \textbf{Computer Architecture:} RV32I/M ISA and microcode, pipelining,
-    branch prediction, cache management and bus snooping
+    Cocotb, RTL waveform debug, formal reachability proofs for FSMs, static
+    timing analysis (STA), constrained random testing
+  \item \textbf{EDA and Flow:} Cadence Virtuoso, Cadence synthesis and
+    simulation, Yosys, SPICE, RTL-to-GDSII flow (netlist, place and route,
+    GDSII), TSMC 28nm planar PDK, Sky130 PDK, generic 45nm planar PDK, KiCad
+  \item \textbf{Computer Architecture:} RISC-V (RV32I/M) ISA and microcode,
+    pipelining, branch prediction, cache management and bus snooping
+  \item \textbf{Clocking and Custom Circuits:} PLLs, ring oscillators, digitally
+    controlled delay lines (DCDL), standard-cell library design, PPA (power,
+    performance, area) optimization
   \item \textbf{Embedded Systems:} Embedded C++, RTOS development, bootloader
-    design, custom serial protocols, hard real-time systems, memory-mapped
-    peripheral firmware development
+    design, UART/USART and QSPI, custom serial protocols, hard real-time
+    systems, memory-mapped peripheral firmware development, sensor fusion
+    (Kalman filter)
   \item \textbf{Hardware Acceleration:} Systolic arrays, neural-network
     inference, KNN acceleration, decision-tree acceleration, floating-point
     arithmetic
@@ -316,9 +355,8 @@ Ken Mai and Jim Bain Research Group, Carnegie Mellon University \hfill
 \begin{itemize}\tightlist
   \item Designed a portion of a taped-out ASIC with a focus on PLL, ring
     oscillators, and FPGA fabric in the TSMC 28nm PDK.
-  \item Designed a ring oscillator and digital phase-locked loop for on-chip
-    clock generation, enabling a 16-fold increase in on-chip clock frequency
-    from 20 MHz to 320 MHz.
+  \item Designed a ring oscillator and digital phase-locked loop that generates a
+    320 MHz on-chip clock from a 20 MHz reference, a 16-fold increase.
   \item Redesigning the PLL for a new tape-out, targeting a 400 MHz on-chip
     clock frequency.
   \item Verifying PLL behavior with SPICE simulation.
@@ -336,10 +374,8 @@ Ken Mai and Jim Bain Research Group, Carnegie Mellon University \hfill
 Heterostructure Construction} \\
 HackerFab, Carnegie Mellon University \hfill \cvwhen{Sep 2025 - Dec 2025}
 \begin{itemize}\tightlist
-  \item Improved high-accuracy nanopositioning system resolution by an order of
-    magnitude.
-  \item Led a team that reduced the uncertainty in the positioning system to
-    below 400nm.
+  \item Led a team that improved high-accuracy nanopositioning system resolution
+    from 10µm to 400nm.
   \item \textbf{Technologies:} Embedded C++, CAD and CAM, piezoelectric
     nanopositioning.
 \end{itemize}
@@ -372,7 +408,7 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
 \end{itemize}
 
 \entrysep
-\textbf{Electronics Head, Robotics Club} \hfill \cvwhen{Aug 2025 - Present}
+\textbf{Electronics Master, Robotics Club} \hfill \cvwhen{Aug 2025 - Present}
 \begin{itemize}\tightlist
   \item Lead the electronics subgroup of the club.
 \end{itemize}
@@ -392,7 +428,7 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
 \entrysep
 \textbf{Physics Engine ASIC} \hfill \cvwhen{Dec 2025 - Present}
 \begin{itemize}\tightlist
-  \item Tape out: Sky130 open source PDK; Fab: TinyTapeout.
+  \item Tape out: Sky130 open-source PDK (SkyWater 130nm), via the TinyTapeout shuttle.
   \item Implemented a falling sand simulation with output over VGA.
   \item QSPI memory controller reduced required on-chip memory to 1/8 of
     original size (from 96 bytes to 12 bytes).
@@ -407,6 +443,23 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
     obeyed.
   \item Constructed a test bench using Cocotb and Python, and verified
     functionality with assertions and constrained random testing.
+\end{itemize}
+
+\entrysep
+\textbf{Lightweight Autonomous Vehicle Firmware, Robobuggy} \hfill
+\cvwhen{Jan 2023 - Present}
+\begin{itemize}\tightlist
+  \item Designed, constructed, and maintained a high-performance embedded
+    system in C++ over the course of four years. Lead designer for two of those
+    years.
+  \item Leveraged an existing embedded system architecture and carefully chosen
+    consumer hardware to maximize performance per dollar.
+  \item Embedded software engineering with hard real-time requirements and
+    tight control loops. Average control loop time under 10 microseconds.
+  \item Designed PCBs to interface microcontrollers with peripheral devices
+    including GPS, servo actuators, accelerometers, encoders, and 433MHz radios.
+  \item Collaborated with control-system experts to design an Unscented Kalman
+    Filter to integrate disparate sensor streams into a cohesive whole.
 \end{itemize}
 
 \entrysep
@@ -448,12 +501,26 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
 \end{itemize}
 
 \entrysep
-\textbf{Matrix Multiplication, Addition, and Inner Product Hardware} \hfill
-\cvwhen{Sep 2024 - Dec 2024}
+\textbf{K Nearest Neighbor Inference Accelerator} \hfill
+\cvwhen{Sep 2025 - Dec 2025}
 \begin{itemize}\tightlist
-  \item Interfaced with DSP slices and ROMs on an Intel Altera DE10 FPGA.
-  \item Coordination between all available DSP hard cores and ROM modules
-    within 98\% of the dataflow limit on the number of compute cycles.
+  \item Designed a series of hardware threads that implemented the K Nearest
+    Neighbor machine learning algorithm.
+  \item Heavily pipelined design and Manhattan distance calculation maximized
+    clock frequency.
+  \item Exceeded the 300 MHz timing requirement (PDK specified by 18-340).
+\end{itemize}
+
+\entrysep
+\textbf{Decision Tree Training Accelerator} \hfill \cvwhen{Sep 2025 - Dec 2025}
+\begin{itemize}\tightlist
+  \item Designed a series of hardware threads that accelerated decision tree
+    machine learning algorithm training.
+  \item Calculated Gini score using custom multiplication hardware.
+  \item Leveraged arithmetic properties of numerical representation to bypass
+    expensive computations.
+  \item Custom multiplication hardware reduced cycles per operation from 32
+    to 1.
 \end{itemize}
 
 \entrysep
@@ -480,6 +547,15 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
 \end{itemize}
 
 \entrysep
+\textbf{Matrix Multiplication, Addition, and Inner Product Hardware} \hfill
+\cvwhen{Sep 2024 - Dec 2024}
+\begin{itemize}\tightlist
+  \item Interfaced with DSP slices and ROMs on an Intel Altera DE10 FPGA.
+  \item Coordination between all available DSP hard cores and ROM modules
+    within 98\% of the dataflow limit on the number of compute cycles.
+\end{itemize}
+
+\entrysep
 \textbf{CPU Arithmetic Coprocessor and Microcode Modification} \hfill
 \cvwhen{Sep 2024 - Dec 2024}
 \begin{itemize}\tightlist
@@ -488,47 +564,6 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
   \item Coprocessor design minimized instruction decode logic and microcode
     architecture, and eliminated software-based data dependence hazards using
     hardware solutions.
-\end{itemize}
-
-\entrysep
-\textbf{K Nearest Neighbor Inference Accelerator} \hfill
-\cvwhen{Sep 2025 - Dec 2025}
-\begin{itemize}\tightlist
-  \item Designed a series of hardware threads that implemented the K Nearest
-    Neighbor machine learning algorithm.
-  \item Heavily pipelined design and Manhattan distance calculation maximized
-    clock frequency.
-  \item Exceeded 300 MHz timing requirement.
-\end{itemize}
-
-\entrysep
-\textbf{Decision Tree Training Accelerator} \hfill \cvwhen{Sep 2025 - Dec 2025}
-\begin{itemize}\tightlist
-  \item Designed a series of hardware threads that accelerated decision tree
-    machine learning algorithm training.
-  \item Calculated Gini score using custom designed multiplication and division
-    hardware threads.
-  \item Leveraged arithmetic properties of numerical representation to bypass
-    expensive computations.
-  \item Custom multiplication hardware reduced cycles per operation from 32
-    to 1.
-\end{itemize}
-
-\entrysep
-\textbf{Lightweight Autonomous Vehicle Firmware, Robobuggy} \hfill
-\cvwhen{Jan 2023 - Present}
-\begin{itemize}\tightlist
-  \item Designed, constructed, and maintained a high-performance embedded
-    system in C++ over the course of four years. Lead designer for two of those
-    years.
-  \item Leveraged an existing embedded system architecture and carefully chosen
-    consumer hardware to maximize performance per dollar.
-  \item Embedded software engineering with hard real-time requirements and
-    tight control loops. Average control loop time under 10 microseconds.
-  \item Designed PCBs to interface microcontrollers with peripheral devices
-    including GPS, servo actuators, accelerometers, encoders, and 433MHz radios.
-  \item Collaborated with control-system experts to design an Unscented Kalman
-    Filter to integrate disparate sensor streams into a cohesive whole.
 \end{itemize}
 
 \entrysep

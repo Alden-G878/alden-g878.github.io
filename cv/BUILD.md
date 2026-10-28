@@ -13,10 +13,9 @@ Sections: **1** regenerate the artifacts · **2** verify before pushing ·
 **3** what CI checks · **4** deploy · **5** verify the PDF text layer ·
 **6** gotchas · **7** pandoc-friendly rules · **8** what is committed ·
 **9** content discipline.
-> ⚠️ **Current status:** `cv/cv.tex` is a *stub*. Every `[BRACKETED]` token is a
-> placeholder, and the PDF says so in its own body text. Replace the stub with
-> the real master CV once it is available, then re-run `cv/build.sh`. Do not
-> invent content to fill the placeholders — see §9.
+> **Current status:** `cv/cv.tex` holds the real master CV — no placeholders
+> remain. Edit it and re-run `cv/build.sh` when content changes (see §9 for the
+> content rules).
 >
 > **Infrastructure status:** `.github/workflows/deploy.yml` is committed. The one
 > remaining manual step is switching *Settings → Pages → Source* to **GitHub
@@ -87,24 +86,18 @@ The original recipe ran `apt-get update && apt-get install texlive-*` on **every
 invocation**, which was ~26 s of a ~30 s build — repeated on every local edit and
 on every CI push, since GitHub-hosted runners have no Docker layer cache.
 
-Measured on this repository:
-
-| Configuration | One-time | Every run |
-|---|---|---|
-| `apt-get install texlive` per run (original) | — | **29.7 s** |
-| Prebuilt image, apt layers baked | ~45 s | 2.0 s |
-| Prebuilt + fonts baked in | ~45 s | **0.75 s** (both artifacts) |
-
-The remaining 2.0 s→0.75 s gap is the font warm-up. `cv/Dockerfile` compiles
-`cv/warmup.tex` at build time so the EC/LModern PK fonts already exist; without
-it, `pdflatex` regenerates ~8 fonts per run via `mktexpk`.
+`cv/Dockerfile` also compiles `cv/warmup.tex` at build time to pre-bake the
+EC/LModern bitmap fonts. **This is inert for the current CV:** `cv.tex` loads
+`times` (PSNFSS), so the document is typeset in the scalable Type1 Times/Nimbus
+fonts and pdfTeX generates no `mktexpk` fonts at all on a build (measured: 0).
+The warm-up is kept only for the case where the font setup changes; it is a
+performance hint, not a correctness dependency.
 
 Two traps in that warm-up, both of which silently degrade it to a no-op:
 
-1. **It must match `cv.tex`'s class options.** `cv.tex` is `[11pt,letterpaper]`,
-   so `\normalsize` is 10.95pt (`ecrm1095`). A bare `\documentclass{article}` is
-   10pt, which bakes 1000-series fonts and leaves the 1095-series to be generated
-   anyway. If `cv.tex`'s base size or `fontenc` changes, update `warmup.tex`.
+1. **It must match `cv.tex`'s class options.** `cv.tex` is `[10pt,letterpaper]`,
+   so `\normalsize` is 10pt (`ecrm1000`). If `cv.tex`'s base size or `fontenc`
+   changes, update `warmup.tex`.
 2. **`\usefont` takes NFSS family names, not EC file names.** Use `cmr`/`cmss`/
    `cmtt`; `ecrm`/`ecss` select nothing and bake no fonts.
 
@@ -201,10 +194,9 @@ bundle exec jekyll serve          # then check /cv/ in a browser
 
 On `/cv/`, with all three tabs (*Interactive CV | Document (HTML) | Document (PDF)*):
 
-- **Document (HTML)** shows the rendered `cv.tex` with the header, the
-  `Placeholder document.` notice, and `Summary` / `Education` / `Skills` /
-  `Research Experience` / `Leadership` / `Project Experience` as `<h2>`
-  headings.
+- **Document (HTML)** shows the rendered `cv.tex` with the header and `Summary` /
+  `Education` / `Technical Skills` / `Research Experience` / `Leadership` /
+  `Project Experience` as `<h2>` headings.
 - **Interactive CV** shows the same sections built from `_data/`, including
   `Leadership`. The two panes are separate build paths (pandoc vs Liquid) that
   target the same structure — if you add a section to one, add it to the other.
@@ -217,12 +209,16 @@ On `/cv/`, with all three tabs (*Interactive CV | Document (HTML) | Document (PD
 - Arrow keys move between tabs and the focus ring follows only the focused one.
 - Skip link, a single sidebar, and `page page--cv` on the article are intact.
 
-The CV is currently **3 pages**, matching the master CV it mirrors, at a matched
-density (0.5in margins, 13.1pt leading vs the master's ~13.2pt). If you edit
-`cv.tex`, re-check the page count before pushing:
+The CV is currently **4 pages**, at the master CV's density (0.5in margins,
+~13.2pt leading). It was 3 pages before entries were kept whole across page
+breaks (`\cvkeep` in `cv.tex`); keeping an entry intact can waste up to its own
+height at a page boundary, which costs roughly one entry of slack per page. The
+author is not length-bound, so the 4th page is accepted rather than tightening
+the layout or cutting entries. If you edit `cv.tex`, re-check the page count
+before pushing:
 
 ```bash
-pdfinfo assets/pdf/Alden_CV.pdf | grep '^Pages'   # expect 3
+pdfinfo assets/pdf/Alden_CV.pdf | grep '^Pages'   # expect 4
 ```
 
 The margin and `\linespread` notes in `cv.tex` record the measured values and
@@ -274,6 +270,24 @@ The drift check uses `git status --porcelain`, not `git diff`: `git diff`
 compares the index against the worktree and is blind to untracked files, so a
 regenerated-but-never-`git add`ed artifact would pass silently. Porcelain
 reports `??`/` M`/` D`, covering all three failure modes.
+
+### Publish date — the `SOURCE_DATE_EPOCH` value must be bumped
+
+`cv/build.sh` sets `SOURCE_DATE_EPOCH` to a hard-coded date, and that date **is
+what a reader sees in the PDF's `CreationDate`/`ModDate`**. It is a publish date,
+not a build date: set it to the date the CV content changes and leave it alone
+between content edits.
+
+```bash
+date -u -d '2026-10-28 12:00:00' +%s   # 1793188800  -> paste into build.sh
+pdfinfo assets/pdf/Alden_CV.pdf | grep -E 'CreationDate|ModDate'   # confirm
+```
+
+Do **not** replace it with `$(date +%s)`. The drift check compares committed
+bytes, so a build-time stamp would make the PDF differ on every CI run and turn
+every deploy red. If the date is stale, the fix is to bump the constant and
+re-commit the artifacts — the drift check will then pass again, because it
+re-derives the same date from the same script.
 
 ### Checking whether the deployed PDF is current
 
@@ -507,6 +521,10 @@ change. See §3.
 The `pdftex` option in `\hypersetup` (in `cv.tex`) is a similar trap: without it,
 `pdftitle`/`pdfauthor` are silently ignored and the metadata is blank again.
 
+Also bump the date itself when you publish content changes — it is the only
+thing readers see as the document's date, and it is hand-maintained by design
+(see §3, "Publish date").
+
 ### The font warm-up fails silently if `warmup.tex` drifts from `cv.tex`
 
 If `cv.tex` changes its base point size or encoding, `cv/warmup.tex` will bake
@@ -578,11 +596,9 @@ lines of setup — and `enumitem` is not needed for correct rendering.
 
 ## 9. Content discipline
 
-Both artifacts are generated, never hand-edited, and this stub is not a licence
-to invent history. Replace placeholders from the real master CV only — the same
-rule that keeps `_projects/` and `_research/` entries at `published: false`
-until real content is parsed.
-
-When the real CV lands: replace the body of `cv.tex`, delete the
-`Placeholder document.` notice and the `\ph{}` markers, run `./cv/build.sh`, and
-commit `cv.tex` plus both regenerated artifacts in one commit.
+Both artifacts are generated, never hand-edited. `cv.tex` now holds the real
+master CV — no placeholders remain — and the same discipline applies to it as to
+the `_projects/` and `_research/` entries: do not invent history, and keep every
+line traceable to the master CV or a verifiable fact. After changing content,
+run `./cv/build.sh` and commit `cv.tex` plus both regenerated artifacts in one
+commit.

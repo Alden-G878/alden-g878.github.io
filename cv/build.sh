@@ -331,14 +331,22 @@ run_pdf() {
   #
   # SOURCE_DATE_EPOCH is the reproducible-builds standard for this, and pdfTeX
   # honours it natively (verified: two runs at the same epoch gave an identical
-  # sha256, while two runs without it differed). The value is a fixed timestamp,
-  # chosen once and never updated, so the PDF only changes when its CONTENT
-  # changes. Metadata, page count and the text layer are unaffected.
+  # sha256, while two runs without it differed). Metadata, page count and the
+  # text layer are unaffected.
+  #
+  # The value is the CV's PUBLISH DATE, and it is bumped by hand whenever the
+  # content changes (see cv/BUILD.md, "Publish date"). It must NOT be the build
+  # time: CI rebuilds the artifacts and fails on drift from the committed copies
+  # (.github/workflows/deploy.yml, "Check for CV drift"), so a live timestamp
+  # would make every deploy red. Pinning to a date keeps the PDF byte-identical
+  # for a given source while still reporting when it was published.
   #
   # Note this is deliberately NOT a "skip the build if nothing changed" cache.
   # Reproducibility is simpler and safer: the build always runs, so it can never
   # serve a stale artifact, and the drift check can still compare bytes.
-  local sde=1700000000 # 2023-11-14T22:13:20Z
+  local sde=1793188800 # 2026-10-28T12:00:00Z (noon UTC — reads as the same
+                       # date in any timezone). Bump on publish:
+                       #   date -u -d '<YYYY-MM-DD> 12:00:00' +%s
 
   if [[ "$USE_HOST" == true ]]; then
     # Compile out-of-tree so no .aux/.log lands in cv/ — `cv/` is excluded from

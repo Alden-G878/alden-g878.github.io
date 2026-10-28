@@ -11,6 +11,8 @@ expected_graduation: "December 2026"
 # Second degree, specific to this site: the combined MS/BS programme.
 expected_ms: "Expected MS in Electrical and Computer Engineering (combined MS/BS program), graduating 2028, with Ph.D. intent"
 gpa: null # intentionally null — not published on the master CV
+honors:
+  - "College of Engineering Dean's List (Spring 2024)"
 notable_classwork:
   - "18-447: Introduction to Computer Architecture"
   - "18-320: Microelectronic Circuits"

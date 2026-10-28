@@ -23,6 +23,19 @@
          title=site.data.education.degree
          org=site.data.education.institution
          dates=site.data.education.expected_graduation %}
+    {% comment %}
+      The combined MS/BS line and honors are on the master CV's Education block
+      (cv/cv.tex). They are rendered from _data here so the interactive pane and
+      the document view agree — `expected_ms` in particular was previously a dead
+      key: defined in the data file but consumed by no template, so the MS line
+      appeared in the PDF only.
+    {% endcomment %}
+    {% if site.data.education.expected_ms %}
+      <p class="cv-ms">{{ site.data.education.expected_ms }}</p>
+    {% endif %}
+    {% if site.data.education.honors and site.data.education.honors.size > 0 %}
+      <p><strong>Honors:</strong> {{ site.data.education.honors | join: ", " }}</p>
+    {% endif %}
     {% if site.data.education.notable_classwork and site.data.education.notable_classwork.size > 0 %}
       {% assign first_classwork = site.data.education.notable_classwork.first %}
       {% unless first_classwork contains "Placeholder" %}
