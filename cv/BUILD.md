@@ -388,6 +388,32 @@ without serving it; `serve` also watches for changes.)
 > CSS you see will be larger than production. That is expected — the style is
 > forced to `compressed` in production, mirroring native Pages (§6).
 
+#### Local toolchain: `bundle` needs Ruby 3.2
+
+`bundle exec jekyll` requires Ruby **3.2**, because the gems under
+`vendor/bundle/ruby/3.2.0` are ABI-locked to it and every binstub in that tree
+starts `#!/usr/bin/env ruby3.2`. Ubuntu 26.04 only ships Ruby 3.3, and the
+system RubyGems binstubs in `/usr/local/bin` (`bundle`, `jekyll`, `rake`, …)
+still have `#!/usr/bin/ruby3.2` hardcoded, so a plain `bundle` fails with
+`bad interpreter` / `env: 'ruby3.2': No such file or directory`.
+
+The fix in place on this machine:
+
+| Path | What |
+|---|---|
+| `~/.rubies/ruby-3.2.11` | user-space Ruby 3.2.11 (built from source; `--with-libyaml-dir=~/.local`) |
+| `~/.local/bin/ruby3.2` | symlink to it, so every `#!/usr/bin/env ruby3.2` binstub resolves |
+| `~/.local/bin/bundle` | symlink to that Ruby's `bundle`; shadows the broken `/usr/local/bin/bundle` |
+
+`gem pristine` and `bundle install` were re-run so the native gems (`json`,
+`openssl`, `bigdecimal`, `eventmachine`, `http_parser.rb`) have extensions built
+for 3.2.11. `Gemfile.lock` and the committed tree are unaffected — `vendor/` is
+ignored, and CI installs its own 3.2 fresh, so nothing here changes what deploys.
+
+If `bundle` ever breaks again, check in order: `ruby3.2 -v`, then
+`bundle exec jekyll --version`, then `git status` (a dirty `Gemfile.lock` means
+something re-resolved).
+
 ### Verify a deploy
 
 ```bash
