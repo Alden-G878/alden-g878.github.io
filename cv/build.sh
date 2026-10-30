@@ -344,7 +344,7 @@ run_pdf() {
   # Note this is deliberately NOT a "skip the build if nothing changed" cache.
   # Reproducibility is simpler and safer: the build always runs, so it can never
   # serve a stale artifact, and the drift check can still compare bytes.
-  local sde=1793188800 # 2026-10-28T12:00:00Z (noon UTC — reads as the same
+  local sde=1793361600 # 2026-10-30T12:00:00Z (noon UTC — reads as the same
                        # date in any timezone). Bump on publish:
                        #   date -u -d '<YYYY-MM-DD> 12:00:00' +%s
 

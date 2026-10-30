@@ -158,9 +158,15 @@
 % effect in pdfTeX; the values are plain ASCII deliberately, since PDFDocEncoding
 % handles the em dash poorly in metadata strings.
 %
+% Exception: pdftitle now carries the em dash, because the title has to read
+% exactly as the /cv/ page's <h1> ("Alden Grover — Curriculum Vitae") — a
+% human-facing string that a reader compares side by side. Verified with
+% `pdfinfo | grep Title` that pdfTeX encodes it as a UTF-16BE metadata string
+% and poppler extracts the em dash back intact; the remaining values stay ASCII.
+%
 \hypersetup{
   pdftex,
-  pdftitle  = {Alden Grover - Curriculum Vitae},
+  pdftitle  = {Alden Grover — Curriculum Vitae},
   pdfauthor = {Alden Grover},
   pdfsubject= {Curriculum Vitae - Electrical and Computer Engineering},
   pdfkeywords={RTL design, ASIC design, verification, computer architecture, embedded systems, computer engineering, SystemVerilog, tape out, FPGA},
@@ -285,7 +291,7 @@
 %
 % The website and GitHub ARE linked, since a URL is both a link and literal text.
 \begin{center}
-  {\Large\bfseries Alden Grover}\\[2pt]
+  {\Large\bfseries Alden Grover — Curriculum Vitae}\\[2pt]
   Pittsburgh, PA \textbullet\ aldengrover@gmail.com \textbullet\ 646-539-8055\\
   \href{https://alden-g878.github.io}{alden-g878.github.io}
   \textbullet\
@@ -294,9 +300,9 @@
 
 % ---- Summary --------------------------------------------------------------
 \cvsection{Summary}
-Seeking spring/summer 2027 internships in digital circuit and RTL design,
-verification, and research. BS/MS combined student with Ph.D. intent, open to
-industry roles between degrees.
+Seeking spring/summer 2027 internships in digital circuit and RTL design and
+research. BS/MS combined student with Ph.D. intent, open to industry roles
+between degrees.
 
 % ---- Education ------------------------------------------------------------
 \cvsection{Education}
@@ -327,9 +333,9 @@ graduating 2028, with Ph.D. intent \\
     GDSII), TSMC 28nm planar PDK, Sky130 PDK, generic 45nm planar PDK, KiCad
   \item \textbf{Computer Architecture:} RISC-V (RV32I/M) ISA and microcode,
     pipelining, branch prediction, cache management and bus snooping
-  \item \textbf{Clocking and Custom Circuits:} PLLs, ring oscillators, digitally
-    controlled delay lines (DCDL), standard-cell library design, PPA (power,
-    performance, area) optimization
+  \item \textbf{Clocking and Custom Circuits:} PLLs, all-digital PLL (ADPLL),
+    ring oscillators, digitally controlled delay lines (DCDL), standard-cell
+    library design, PPA (power, performance, area) optimization
   \item \textbf{Embedded Systems:} Embedded C++, RTOS development, bootloader
     design, UART/USART and QSPI, custom serial protocols, hard real-time
     systems, memory-mapped peripheral firmware development, sensor fusion
@@ -346,7 +352,7 @@ graduating 2028, with Ph.D. intent \\
 
 \textbf{Design space exploration for Pareto-optimal design of a Digitally
 Controlled Delay Line utilizing current starved and path choice methods} \\
-Ken Mai and Jim Bain Research Group, Carnegie Mellon University \hfill
+Mai \& Bain Research Group, Carnegie Mellon University \hfill
 \cvwhen{Aug 2026 - Present (in preparation)}
 \begin{itemize}\tightlist
   \item Leading investigation into a Pareto-optimal method to combine path
@@ -362,7 +368,7 @@ Ken Mai and Jim Bain Research Group, Carnegie Mellon University \hfill
 
 \entrysep
 \textbf{IC I/O Harness on Commercial Processes and Tools} \\
-Ken Mai and Jim Bain Research Group, Carnegie Mellon University \hfill
+Mai \& Bain Research Group, Carnegie Mellon University \hfill
 \cvwhen{Oct 2025 - Present}
 \begin{itemize}\tightlist
   \item Designing an all-digital PLL (ADPLL) and a physics engine simulating
