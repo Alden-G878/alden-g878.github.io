@@ -21,9 +21,9 @@ tech_stack:
   - "VGA"
 flagship: true
 summary: >
-  A taped-out ASIC implementing a falling sand physics simulation with VGA output. A QSPI memory controller cut on-chip memory to one eighth of its original size.
+  A taped-out ASIC implementing a falling sand physics simulation with VGA output. A QSPI memory controller moved the grid state to external RAM, cutting on-chip state to one eighth.
 metrics:
-  - "On-chip memory reduced to 1/8 of original size (96 bytes to 12 bytes)"
+  - "On-chip state cut from 96 bytes to 12 bytes (1/8) by moving the grid to external QSPI RAM"
   - "Clock cycles per physics simulation tick reduced by a factor of three"
 notes_missing_data: false
 ---
@@ -32,16 +32,12 @@ notes_missing_data: false
 
 - Implemented a falling sand simulation with output over VGA
 
-- QSPI memory controller reduced required on-chip memory to 1/8 of original size (from 96 bytes to 12 bytes)
+- Moved the simulation grid into external QSPI RAM, leaving a 12-byte on-chip working buffer instead of 96 bytes (1/8 the on-chip state), with the protocol's intra-clock-edge timing closed using fixed-delay buffers
 
 - Complete ASIC design flow: RTL design, RTL simulation/debug, netlist generation, place and route, GDSII generation
 
 - Reduced clock cycles per physics simulation tick by a factor of three by adapting a physics simulation technique from graphics programming
 
 - Utilized RTL waveform debugging to fix bugs in the RTL design
-
-- Interfaced with external RAM hardware via QSPI, requiring intra-clock edge timing control
-
-- Leveraged fixed-delay digital buffers to ensure all protocols are obeyed
 
 - Constructed a test bench using Cocotb and Python, and verified functionality with assertions and constrained random testing

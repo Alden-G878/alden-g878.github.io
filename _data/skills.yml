@@ -26,7 +26,8 @@
 
 "EDA and Flow":
   - "Cadence Virtuoso"
-  - "Cadence synthesis and simulation"
+  - "Synopsys VCS"
+  - "Intel Quartus"
   - "Yosys"
   - "SPICE"
   - "RTL-to-GDSII flow (netlist, place and route, GDSII)"

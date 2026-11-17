@@ -21,7 +21,7 @@ Expected MS in Electrical and Computer Engineering (combined MS/BS program), gra
 <ul>
 <li><p><strong>RTL Design:</strong> SystemVerilog, Verilog, ASIC RTL design and tape out, FPGA design, TinyTapeout, network-on-chip (NoC) design, USB 2.0 hardware, finite state machines (FSMs) for datapath control, VGA waveform generation</p></li>
 <li><p><strong>RTL Verification and Simulation:</strong> SystemVerilog testbenches, Cocotb, RTL waveform debug, formal reachability proofs for FSMs, static timing analysis (STA), constrained random testing</p></li>
-<li><p><strong>EDA and Flow:</strong> Cadence Virtuoso, Cadence synthesis and simulation, Yosys, SPICE, RTL-to-GDSII flow (netlist, place and route, GDSII), TSMC 28nm planar PDK, Sky130 PDK, generic 45nm planar PDK, KiCad</p></li>
+<li><p><strong>EDA and Flow:</strong> Cadence Virtuoso, Synopsys VCS, Intel Quartus, Yosys, SPICE, RTL-to-GDSII flow (netlist, place and route, GDSII), TSMC 28nm planar PDK, Sky130 PDK, generic 45nm planar PDK, KiCad</p></li>
 <li><p><strong>Computer Architecture:</strong> RISC-V (RV32I/M) ISA and microcode, pipelining, branch prediction, cache management and bus snooping</p></li>
 <li><p><strong>Clocking and Custom Circuits:</strong> PLLs, all-digital PLL (ADPLL), ring oscillators, digitally controlled delay lines (DCDL), standard-cell library design, PPA (power, performance, area) optimization</p></li>
 <li><p><strong>Embedded Systems:</strong> Embedded C++, RTOS development, bootloader design, UART/USART and QSPI, custom serial protocols, hard real-time systems, memory-mapped peripheral firmware development, sensor fusion (Kalman filter)</p></li>
@@ -39,14 +39,14 @@ Mai &amp; Bain Research Group, Carnegie Mellon University <span class="sans-seri
 <li><p>Verifying proposed techniques with brute force simulation on a small-scale model and directed simulation on a large-scale implementation.</p></li>
 </ul>
 <p></p>
-<p><strong>IC I/O Harness on Commercial Processes and Tools</strong><br />
+<p><strong>All-Digital PLL (ADPLL) and I/O Harness for a TSMC 28nm Test Chip</strong><br />
 Mai &amp; Bain Research Group, Carnegie Mellon University <span class="sans-serif">Oct 2025 - Present</span></p>
 <ul>
-<li><p>Designing an all-digital PLL (ADPLL) and a physics engine simulating three-body gravitational interactions for a TSMC 28nm test chip, targeting a December 2026 tape-out. The ADPLL targets a 16-fold clock increase.</p></li>
+<li><p>Designing an all-digital PLL (ADPLL) and a physics engine simulating three-body gravitational interactions for a TSMC 28nm test chip, targeting a December 2026 tape-out. The ADPLL targets 1 GHz from a 25 MHz reference (40x).</p></li>
 <li><p>Contributing to I/O pad ring physical design for that chip under a PhD student: ring layout, power and ground distribution, and DRC/LVS closure.</p></li>
 <li><p>Designed the voltage-domain circuitry for the harness carrier board: FPGA-configurable regulators supplying custom voltage domains.</p></li>
-<li><p>Designed a 180nm ADPLL targeting the same 16-fold clock increase, up to 320 MHz from a 20 MHz reference, and its FPGA fabric with a partner. That chip was shelved before tape-out.</p></li>
-<li><p><strong>Technologies:</strong> SystemVerilog RTL, Cadence synthesis and simulation, SPICE.</p></li>
+<li><p>Designed a 180nm ADPLL targeting a 16-fold clock increase, up to 320 MHz from a 20 MHz reference, and its FPGA fabric with a partner. That chip was shelved before tape-out.</p></li>
+<li><p><strong>Technologies:</strong> SystemVerilog RTL, Cadence Virtuoso, SPICE.</p></li>
 </ul>
 <p></p>
 <p><strong>Nanopositioning System for Lithography and Van der Waals Heterostructure Construction</strong><br />
@@ -85,12 +85,10 @@ Carnegie Mellon University <span class="sans-serif">Jan 2026 - May 2026</span></
 <ul>
 <li><p>Tape out: Sky130 open-source PDK (SkyWater 130nm), via the TinyTapeout shuttle.</p></li>
 <li><p>Implemented a falling sand simulation with output over VGA.</p></li>
-<li><p>QSPI memory controller reduced required on-chip memory to 1/8 of original size (from 96 bytes to 12 bytes).</p></li>
+<li><p>Moved the simulation grid into external QSPI RAM, leaving a 12-byte on-chip working buffer instead of 96 bytes (1/8 the on-chip state), with the protocol’s intra-clock-edge timing closed using fixed-delay buffers.</p></li>
 <li><p>Complete ASIC design flow: RTL design, RTL simulation/debug, netlist generation, place and route, GDSII generation.</p></li>
 <li><p>Reduced clock cycles per physics simulation tick by a factor of three by adapting a physics simulation technique from graphics programming.</p></li>
 <li><p>Utilized RTL waveform debugging to fix bugs in the RTL design.</p></li>
-<li><p>Interfaced with external RAM hardware via QSPI, requiring intra-clock edge timing control.</p></li>
-<li><p>Leveraged fixed-delay digital buffers to ensure all protocols are obeyed.</p></li>
 <li><p>Constructed a test bench using Cocotb and Python, and verified functionality with assertions and constrained random testing.</p></li>
 </ul>
 <p></p>
@@ -113,7 +111,7 @@ Carnegie Mellon University <span class="sans-serif">Jan 2026 - May 2026</span></
 <p><strong>7-stage Patterson and Hennessy style RV32I Core</strong> <span class="sans-serif">Jan 2026 - May 2026</span></p>
 <ul>
 <li><p>Implemented an RV32I core in SystemVerilog with 7 pipeline stages.</p></li>
-<li><p>Maximal forwarding between pipeline stages minimized data-dependent stalling. The final implementation was more than 5 times faster than the naive approach using real-world RV32I programs.</p></li>
+<li><p>Maximal forwarding between pipeline stages minimized data-dependent stalling. The final implementation ran more than 5 times faster on real RV32I programs than a non-forwarding version that stalls on data dependencies.</p></li>
 <li><p>Designed a two-bit branch predictor with a branch target buffer that doubled accurate branch predictions from 40% to 80%.</p></li>
 <li><p>Implemented a cache-management solution that successfully arbitrated cache conflicts inherent in non-atomic bus snooping systems.</p></li>
 </ul>

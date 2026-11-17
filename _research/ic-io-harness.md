@@ -1,5 +1,5 @@
 ---
-title: "IC I/O Harness on Commercial Processes and Tools"
+title: "All-Digital PLL (ADPLL) and I/O Harness for a TSMC 28nm Test Chip"
 published: true
 date_start: 2025-10-01
 date_end: null              # null = ongoing
@@ -30,12 +30,12 @@ summary: >
 metrics: []
 ---
 
-- Designing an all-digital PLL (ADPLL) and a physics engine simulating three-body gravitational interactions for a TSMC 28nm test chip, targeting a December 2026 tape-out; the ADPLL targets a 16-fold clock increase
+- Designing an all-digital PLL (ADPLL) and a physics engine simulating three-body gravitational interactions for a TSMC 28nm test chip, targeting a December 2026 tape-out; the ADPLL targets 1 GHz from a 25 MHz reference (40x)
 
 - Contributing to I/O pad ring physical design for that chip under a PhD student, including ring layout, power and ground distribution, and DRC/LVS closure
 
 - Designed the voltage-domain circuitry for the harness carrier board: FPGA-configurable regulators supplying custom voltage domains
 
-- Designed a 180nm ADPLL targeting the same 16-fold clock increase, up to 320 MHz from a 20 MHz reference, and its FPGA fabric with a partner; that chip was shelved before tape-out
+- Designed a 180nm ADPLL targeting a 16-fold clock increase, up to 320 MHz from a 20 MHz reference, and its FPGA fabric with a partner; that chip was shelved before tape-out
 
-- Technologies: SystemVerilog RTL, Cadence synthesis and simulation, SPICE
+- Technologies: SystemVerilog RTL, Cadence Virtuoso, SPICE

@@ -328,8 +328,8 @@ graduating 2028, with Ph.D. intent \\
   \item \textbf{RTL Verification and Simulation:} SystemVerilog testbenches,
     Cocotb, RTL waveform debug, formal reachability proofs for FSMs, static
     timing analysis (STA), constrained random testing
-  \item \textbf{EDA and Flow:} Cadence Virtuoso, Cadence synthesis and
-    simulation, Yosys, SPICE, RTL-to-GDSII flow (netlist, place and route,
+  \item \textbf{EDA and Flow:} Cadence Virtuoso, Synopsys VCS, Intel Quartus,
+    Yosys, SPICE, RTL-to-GDSII flow (netlist, place and route,
     GDSII), TSMC 28nm planar PDK, Sky130 PDK, generic 45nm planar PDK, KiCad
   \item \textbf{Computer Architecture:} RISC-V (RV32I/M) ISA and microcode,
     pipelining, branch prediction, cache management and bus snooping
@@ -367,22 +367,21 @@ Mai \& Bain Research Group, Carnegie Mellon University \hfill
 \end{itemize}
 
 \entrysep
-\textbf{IC I/O Harness on Commercial Processes and Tools} \\
+\textbf{All-Digital PLL (ADPLL) and I/O Harness for a TSMC 28nm Test Chip} \\
 Mai \& Bain Research Group, Carnegie Mellon University \hfill
 \cvwhen{Oct 2025 - Present}
 \begin{itemize}\tightlist
   \item Designing an all-digital PLL (ADPLL) and a physics engine simulating
     three-body gravitational interactions for a TSMC 28nm test chip, targeting a
-    December 2026 tape-out. The ADPLL targets a 16-fold clock increase.
+    December 2026 tape-out. The ADPLL targets 1 GHz from a 25 MHz reference (40x).
   \item Contributing to I/O pad ring physical design for that chip under a PhD
     student: ring layout, power and ground distribution, and DRC/LVS closure.
   \item Designed the voltage-domain circuitry for the harness carrier board:
     FPGA-configurable regulators supplying custom voltage domains.
-  \item Designed a 180nm ADPLL targeting the same 16-fold clock increase, up to
+  \item Designed a 180nm ADPLL targeting a 16-fold clock increase, up to
     320 MHz from a 20 MHz reference, and its FPGA fabric with a partner. That
     chip was shelved before tape-out.
-  \item \textbf{Technologies:} SystemVerilog RTL, Cadence synthesis and
-    simulation, SPICE.
+  \item \textbf{Technologies:} SystemVerilog RTL, Cadence Virtuoso, SPICE.
 \end{itemize}
 
 \entrysep
@@ -446,17 +445,14 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
 \begin{itemize}\tightlist
   \item Tape out: Sky130 open-source PDK (SkyWater 130nm), via the TinyTapeout shuttle.
   \item Implemented a falling sand simulation with output over VGA.
-  \item QSPI memory controller reduced required on-chip memory to 1/8 of
-    original size (from 96 bytes to 12 bytes).
+  \item Moved the simulation grid into external QSPI RAM, leaving a 12-byte
+    on-chip working buffer instead of 96 bytes (1/8 the on-chip state), with the
+    protocol's intra-clock-edge timing closed using fixed-delay buffers.
   \item Complete ASIC design flow: RTL design, RTL simulation/debug, netlist
     generation, place and route, GDSII generation.
   \item Reduced clock cycles per physics simulation tick by a factor of three
     by adapting a physics simulation technique from graphics programming.
   \item Utilized RTL waveform debugging to fix bugs in the RTL design.
-  \item Interfaced with external RAM hardware via QSPI, requiring intra-clock
-    edge timing control.
-  \item Leveraged fixed-delay digital buffers to ensure all protocols are
-    obeyed.
   \item Constructed a test bench using Cocotb and Python, and verified
     functionality with assertions and constrained random testing.
 \end{itemize}
@@ -493,8 +489,9 @@ Carnegie Mellon University \hfill \cvwhen{Jan 2026 - May 2026}
 \begin{itemize}\tightlist
   \item Implemented an RV32I core in SystemVerilog with 7 pipeline stages.
   \item Maximal forwarding between pipeline stages minimized data-dependent
-    stalling. The final implementation was more than 5 times faster than the
-    naive approach using real-world RV32I programs.
+    stalling. The final implementation ran more than 5 times faster on real
+    RV32I programs than a non-forwarding version that stalls on data
+    dependencies.
   \item Designed a two-bit branch predictor with a branch target buffer that
     doubled accurate branch predictions from 40\% to 80\%.
   \item Implemented a cache-management solution that successfully arbitrated
