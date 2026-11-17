@@ -5,8 +5,8 @@ date_start: 2024-01-01
 date_end: 2024-05-01   # null = ongoing
 status: complete
 context: personal
-team_size: 1
-role: solo
+team_size: 2
+role: contributor
 categories:
   - embedded-systems
 tech_stack:
